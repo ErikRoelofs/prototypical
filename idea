@@ -1,0 +1,34 @@
+prototyper:
+
+BASIC:
+- needs a specifically defined excel format	(few hours)
+- needs a GUI tool to pick a file and a storage folder (few hours)
+- needs an Excel importer library to read the file (few hours)
+- needs to do a ton of parsing to convert the Excel file to domain info (weeks?)
+- needs a JSON writing library to convert the domain info to a TTS save file (days?)
+- needs image drawing/saving abilities (days?)
+
+
+
+
+ADVANCED:
+- needs coupling with online hosting to upload excel files
+- needs to load the files on the server
+- needs support for on-the-fly image generation (and a "reload" button that drops the cache)
+- (needs to output a save file with web-based links)
+- needs some kind of license model
+
+
+EXCEL FORMAT:
+- complex-types (name, size, shape, bg-color, backside)
+- shapes (pretty much freeform sizes; use column letters (starting with C) + 0)
+- complex-data (name, type-name, [content columns])
+- decks (name, card identifiers)
+- tokens/markers (cubes, cylinders, triangles, coins, tokens) (name, shape, size, front-color, front-content, back-color?, back-content? )
+- dice (name, color, sides, content?)
+- playing field content (number of sectors, content per sector)
+
+
+
+PROOF OF CONCEPT:
+- convert an excel file with some default markers into an importable save file
