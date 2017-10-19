@@ -1,7 +1,8 @@
 class BlockSquare():
 
-    def __init__(self, transform):
+    def __init__(self, transform, color):
         self.transform = transform
+        self.color = color
 
     def as_dict(self):
         return {
@@ -10,9 +11,9 @@ class BlockSquare():
             'Nickname': '',
             'Description': '',
             'ColorDiffuse': {
-                'r': 0.9264706,
-                'g': 0.0,
-                'b': 0.0
+                'r': self.color[0],
+                'g': self.color[1],
+                'b': self.color[2]
             },
             'Locked': False,
             'Grid': True,
