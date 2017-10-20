@@ -24,11 +24,11 @@ EXCEL FORMAT:
 - shapes (pretty much freeform sizes; use column letters (starting with C) + 0)
 - complex-data (name, type-name, [content columns])
 - decks (name, card identifiers)
-- tokens/markers (cubes, cylinders, triangles, coins, tokens) (name, shape, size, front-color, front-content, back-color?, back-content? )
-- dice (name, color, sides, content?)
-- playing field content (number of sectors, content per sector)
+V- tokens/markers (cubes, cylinders, triangles, coins, tokens) (name, shape, size, front-color, front-content, back-color?, back-content? )
+V- dice (name, color, sides, content?)
+V- playing field content (number of sectors, content per sector)
 
 
 
 PROOF OF CONCEPT:
-- convert an excel file with some default markers into an importable save file
+VVV!!!- convert an excel file with some default markers into an importable save file

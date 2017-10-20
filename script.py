@@ -4,15 +4,15 @@ ZMIN = -17
 ZMAX = 17
 YHEIGHT = 1.5
 
-import json, random, xlrd
+import json, random, xlrd,sys
 from tts.blocksquare import BlockSquare
 from tts.transform import Transform
 from tts.die import Die as TTSDie
 
 from domain.token import Token
-from reader.color import read_color
 from domain.die import Die
-
+from sheetParser.tokenParser import TokenParser
+from sheetParser.diceParser import DiceParser
 
 def findObjectByName(name):
     maybe = findTokenByName(name)
@@ -55,8 +55,6 @@ def getCoordInChunk(chunkX, chunkY, numXChunks, numYChunks):
     yOffset = random.uniform(0, height)
     return ( xOffset + XMIN + (chunkX * width), yOffset + ZMIN + (chunkY * height))
 
-
-
 # open save template
 with open('template.json', 'r') as infile:
     data = json.load(infile)
@@ -64,29 +62,8 @@ with open('template.json', 'r') as infile:
 # open excel file
 workbook = xlrd.open_workbook('cubes.xls')
 
-# read token types
-sheet = workbook.sheet_by_name('Tokens')
-tokens = []
-row = 1
-while row < sheet.nrows:
-    name = sheet.cell(rowx=row, colx=0).value
-    entity = sheet.cell(rowx=row, colx=1).value
-    color = read_color(sheet.cell(rowx=row, colx=2).value)
-    size = sheet.cell(rowx=row, colx=3).value
-    tokens.append(Token(name, entity, color, size))
-    row += 1
-
-# read dice types
-diceSheet = workbook.sheet_by_name('Dice')
-dice = []
-row = 1
-while row < sheet.nrows:
-    name = diceSheet.cell(rowx=row, colx=0).value
-    color = read_color(diceSheet.cell(rowx=row, colx=1).value)
-    size = diceSheet.cell(rowx=row, colx=2).value
-    sides = diceSheet.cell(rowx=row, colx=3).value
-    dice.append(Die(name, color, size, sides))
-    row += 1
+tokens = TokenParser.parse(workbook.sheet_by_name('Tokens'))
+dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
 
 # read item locations
 placementSheet = workbook.sheet_by_name('Placement')
