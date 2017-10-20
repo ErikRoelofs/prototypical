@@ -9,6 +9,7 @@ from tts.blocksquare import BlockSquare
 from tts.transform import Transform
 from domain.token import Token
 from reader.color import read_color
+from domain.die import Die
 
 def findTokenByName(name):
     for token in tokens:
@@ -35,9 +36,9 @@ with open('template.json', 'r') as infile:
 
 # open excel file
 workbook = xlrd.open_workbook('cubes.xls')
-sheet = workbook.sheet_by_name('Tokens')
 
 # read token types
+sheet = workbook.sheet_by_name('Tokens')
 tokens = []
 row = 1
 while row < sheet.nrows:
@@ -48,7 +49,19 @@ while row < sheet.nrows:
     tokens.append(Token(name, entity, color, size))
     row += 1
 
-# read number of chunks
+# read dice types
+diceSheet = workbook.sheet_by_name('Dice')
+dice = []
+row = 1
+while row < sheet.nrows:
+    name = diceSheet.cell(rowx=row, colx=0).value
+    color = read_color(diceSheet.cell(rowx=row, colx=1).value)
+    size = diceSheet.cell(rowx=row, colx=2).value
+    sides = diceSheet.cell(rowx=row, colx=3).value
+    dice.append(Die(name, color, size, sides))
+    row += 1
+
+# read item locations
 placementSheet = workbook.sheet_by_name('Placement')
 chunksWide = placementSheet.cell(rowx=0, colx=1).value
 chunksHigh = placementSheet.cell(rowx=0, colx=2).value
