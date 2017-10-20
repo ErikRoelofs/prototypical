@@ -68,6 +68,3 @@ class ComplexTypeParser:
         if colNum > current[3]:
             current = (current[0], current[1], current[2], colNum)
         return current
-
-    def positionInArea(row, col, area):
-        return area[0] <= row <= area[2] and area[1] <= col <= area[3]
