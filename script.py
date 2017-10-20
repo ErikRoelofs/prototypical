@@ -2,6 +2,7 @@ import json, xlrd
 
 from sheetParser.tokenParser import TokenParser
 from sheetParser.diceParser import DiceParser
+from sheetParser.complexTypeParser import ComplexTypeParser
 
 from creator.entityCreator import EntityCreator
 
@@ -16,6 +17,7 @@ workbook = xlrd.open_workbook('cubes.xls')
 # collect entity libraries
 tokens = TokenParser.parse(workbook.sheet_by_name('Tokens'))
 dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
+complexTypes = ComplexTypeParser.parse(workbook.sheet_by_name('ComplexTypes'), workbook.sheet_by_name('Shapes'))
 
 # build all required entities
 creator = EntityCreator(tokens + dice)
