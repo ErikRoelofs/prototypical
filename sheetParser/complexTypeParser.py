@@ -42,6 +42,7 @@ class ComplexTypeParser:
         areas = {}
         for rowNum, row in enumerate(rows):
             for colNum, char in enumerate(row):
+                # make sure this isn't outside our left boundary
                 ComplexTypeParser.validateAllowed(char, rowNum, colNum, areas)
                 if char == '0':
                     continue
@@ -51,10 +52,14 @@ class ComplexTypeParser:
                     areas[char] = (rowNum, colNum, rowNum, colNum)
         return Shape(areas)
 
-    # make sure that this position is not already claimed by a different char
-    # make sure that this char does not already have a defined area that cannot contain this position
+    # make sure we aren't intruding into some other char's position
+    # make sure it's possible to extend here (we can only extend to the right on our first row, and only down after)
     def validateAllowed(char, rowNum, colNum, areas):
-        return True
+        if char in areas:
+            if areas[char][1] > colNum:
+                raise ValueError("Malformed Shape: trying to extend " + char + " to the left, that means this shape is not a rectangle!")
+            if colNum > areas[char][3] and areas[char][0] != areas[char][2]:
+                raise ValueError("Malformed shape: trying to extend " + char + " to the right, but already on a second row. This shape is not a rectangle!")
 
     # will expand the size of this area to include the new cell (if required)
     def updateArea(current, rowNum, colNum):
@@ -63,3 +68,6 @@ class ComplexTypeParser:
         if colNum > current[3]:
             current = (current[0], current[1], current[2], colNum)
         return current
+
+    def positionInArea(row, col, area):
+        return area[0] <= row <= area[2] and area[1] <= col <= area[3]
