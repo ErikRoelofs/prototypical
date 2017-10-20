@@ -7,19 +7,46 @@ YHEIGHT = 1.5
 import json, random, xlrd
 from tts.blocksquare import BlockSquare
 from tts.transform import Transform
+from tts.die import Die as TTSDie
+
 from domain.token import Token
 from reader.color import read_color
 from domain.die import Die
+
+
+def findObjectByName(name):
+    maybe = findTokenByName(name)
+    if maybe:
+        return maybe
+    maybe = findDieByName(name)
+    if maybe:
+        return maybe
 
 def findTokenByName(name):
     for token in tokens:
         if token.name == name:
             return token
 
+def findDieByName(name):
+    for die in dice:
+        if die.name == name:
+            return die
+
 def placeEntity(coords,entity):
+    if isinstance(entity, Token):
+        placeToken(coords, entity)
+    if isinstance(entity, Die):
+        placeDie(coords, entity)
+
+def placeToken(coords,entity):
     transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
     bs = BlockSquare(transform, entity.color)
     data["ObjectStates"].append(bs.as_dict())
+
+def placeDie(coords,entity):
+    transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
+    die = TTSDie(entity.sides, entity.color, transform)
+    data["ObjectStates"].append(die.as_dict())
 
 def getCoordInChunk(chunkX, chunkY, numXChunks, numYChunks):
     width = (XMAX - XMIN) / numXChunks
@@ -75,7 +102,7 @@ while row < placementSheet.nrows:
         numToPlace = placementSheet.cell(rowx=row, colx=col).value
         if numToPlace:
             typeToPlace = placementSheet.cell(rowx=row, colx=col+1).value
-            token = findTokenByName(typeToPlace)
+            token = findObjectByName(typeToPlace)
             for i in range(0,int(numToPlace)):
                 placeEntity(getCoordInChunk(xChunk, yChunk, chunksWide, chunksHigh), token)
         col += 2
