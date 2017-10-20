@@ -1,4 +1,5 @@
 from domain.complexType import ComplexType
+from domain.shape import Shape
 from reader.color import read_color
 from reader.cell import read_cell
 
@@ -31,7 +32,34 @@ class ComplexTypeParser:
         for row in range(firstRow, lastRow + 1):
             cols = []
             for col in range(firstCol, lastCol + 1):
-                cols.append(shapeSheet.cell(rowx = row, colx = col))
+                cols.append(shapeSheet.cell(rowx = row, colx = col).value)
             rows.append(cols)
 
-        return rows
+        return ComplexTypeParser.constructShape(rows)
+
+    # construct a shape from the given rows of chars
+    def constructShape(rows):
+        areas = {}
+        for rowNum, row in enumerate(rows):
+            for colNum, char in enumerate(row):
+                ComplexTypeParser.validateAllowed(char, rowNum, colNum, areas)
+                if char == '0':
+                    continue
+                if char in areas:
+                    areas[char] = ComplexTypeParser.updateArea(areas[char], rowNum, colNum)
+                else:
+                    areas[char] = (rowNum, colNum, rowNum, colNum)
+        return Shape(areas)
+
+    # make sure that this position is not already claimed by a different char
+    # make sure that this char does not already have a defined area that cannot contain this position
+    def validateAllowed(char, rowNum, colNum, areas):
+        return True
+
+    # will expand the size of this area to include the new cell (if required)
+    def updateArea(current, rowNum, colNum):
+        if rowNum > current[2]:
+            current = (current[0], current[1], rowNum, current[3])
+        if colNum > current[3]:
+            current = (current[0], current[1], current[2], colNum)
+        return current
