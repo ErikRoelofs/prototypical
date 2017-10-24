@@ -4,6 +4,7 @@ from sheetParser.tokenParser import TokenParser
 from sheetParser.diceParser import DiceParser
 from sheetParser.complexTypeParser import ComplexTypeParser
 from sheetParser.complexObjectParser import ComplexObjectParser
+from sheetParser.deckParser import DeckParser
 
 from creator.entityCreator import EntityCreator
 
@@ -30,6 +31,7 @@ dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
 complexTypes = ComplexTypeParser.parse(workbook.sheet_by_name('ComplexTypes'), workbook.sheet_by_name('Shapes'))
 complexParser = ComplexObjectParser(complexTypes)
 complexObjects = complexParser.parse(workbook.sheet_by_name('ComplexObjects'))
+decks = DeckParser.parse(workbook.sheet_by_name('Decks'))
 
 # build all required entities
 creator = EntityCreator(tokens + dice + complexObjects)

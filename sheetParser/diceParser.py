@@ -1,7 +1,6 @@
 from reader.color import read_color
 from domain.die import Die
 
-
 class DiceParser:
     def parse(sheet):
         dice = []
