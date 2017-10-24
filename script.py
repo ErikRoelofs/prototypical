@@ -36,10 +36,12 @@ creator = EntityCreator(tokens + dice + complexObjects)
 entities = creator.createEntities(workbook.sheet_by_name('Placement'))
 
 
-from drawer.ComplexObjectDrawer import ComplexObjectDrawer
-drawer = ComplexObjectDrawer(complexObjects[0])
-surf = drawer.draw()
-pygame.image.save(surf, "test.jpg")
+from drawer.complexObjectDrawer import ComplexObjectDrawer
+from drawer.deckDrawer import DeckDrawer
+deck = DeckDrawer()
+for obj in complexObjects:
+    deck.addCard(ComplexObjectDrawer(obj))
+pygame.image.save(deck.draw(), "test.jpg")
 
 
 # add entities to save file
