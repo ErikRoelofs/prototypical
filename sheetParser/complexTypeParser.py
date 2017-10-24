@@ -54,12 +54,21 @@ class ComplexTypeParser:
 
     # make sure we aren't intruding into some other char's position
     # make sure it's possible to extend here (we can only extend to the right on our first row, and only down after)
+    # todo: make sure an area cannot be entirely inside another
+    # todo: test cases!
     def validateAllowed(char, rowNum, colNum, areas):
         if char in areas:
             if areas[char][1] > colNum:
                 raise ValueError("Malformed Shape: trying to extend " + char + " to the left, that means this shape is not a rectangle!")
             if colNum > areas[char][3] and areas[char][0] != areas[char][2]:
                 raise ValueError("Malformed shape: trying to extend " + char + " to the right, but already on a second row. This shape is not a rectangle!")
+            if areas[char][2]+1 < rowNum:
+                raise ValueError("Malformed shape: trying to extend " + char + " down by two rows at once. This shape is not a rectangle!")
+        for charKey, area in areas.items():
+            if charKey != char:
+                if rowNum == area[2] and area[1] < colNum < area[3]:
+                    raise ValueError("Malformed shape: a " + char + " is inside an area already claimed by " + charKey + ". This shape is not a rectangle!")
+        return True
 
     # will expand the size of this area to include the new cell (if required)
     def updateArea(current, rowNum, colNum):

@@ -7,6 +7,10 @@ from sheetParser.complexObjectParser import ComplexObjectParser
 
 from creator.entityCreator import EntityCreator
 
+from tests.complexTypeParserTest import ComplexTypeParserTest
+
+# run test cases
+ComplexTypeParserTest().run()
 
 # open save template
 with open('template.json', 'r') as infile:
