@@ -9,6 +9,10 @@ from creator.entityCreator import EntityCreator
 
 from tests.complexTypeParserTest import ComplexTypeParserTest
 
+# setup pygame as drawing library
+import pygame
+pygame.init()
+
 # run test cases
 ComplexTypeParserTest().run()
 
@@ -30,6 +34,13 @@ complexObjects = complexParser.parse(workbook.sheet_by_name('ComplexObjects'))
 # build all required entities
 creator = EntityCreator(tokens + dice + complexObjects)
 entities = creator.createEntities(workbook.sheet_by_name('Placement'))
+
+
+from drawer.ComplexObjectDrawer import ComplexObjectDrawer
+drawer = ComplexObjectDrawer(complexObjects[0])
+surf = drawer.draw()
+pygame.image.save(surf, "test.jpg")
+
 
 # add entities to save file
 data["ObjectStates"] = entities
