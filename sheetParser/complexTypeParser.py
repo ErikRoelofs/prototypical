@@ -42,7 +42,6 @@ class ComplexTypeParser:
         areas = {}
         for rowNum, row in enumerate(rows):
             for colNum, char in enumerate(row):
-                # make sure this isn't outside our left boundary
                 ComplexTypeParser.validateAllowed(char, rowNum, colNum, areas)
                 if char == '0':
                     continue
@@ -50,12 +49,8 @@ class ComplexTypeParser:
                     areas[char] = ComplexTypeParser.updateArea(areas[char], rowNum, colNum)
                 else:
                     areas[char] = (rowNum, colNum, rowNum, colNum)
-        return Shape(areas)
+        return Shape(ComplexTypeParser.reduceNames(areas))
 
-    # make sure we aren't intruding into some other char's position
-    # make sure it's possible to extend here (we can only extend to the right on our first row, and only down after)
-    # todo: make sure an area cannot be entirely inside another
-    # todo: test cases!
     def validateAllowed(char, rowNum, colNum, areas):
         if char in areas:
             if areas[char][1] > colNum:
@@ -77,3 +72,13 @@ class ComplexTypeParser:
         if colNum > current[3]:
             current = (current[0], current[1], current[2], colNum)
         return current
+
+    def reduceNames(areas):
+        newAreas = {}
+        for char, area in areas.items():
+            newAreas[ComplexTypeParser.reduceChar(char)] = area
+        return newAreas
+
+    def reduceChar(char):
+        # because 'c' is 0, a and b are reserved
+        return ord(char) - 99

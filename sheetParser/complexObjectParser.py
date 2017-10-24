@@ -10,8 +10,13 @@ class ComplexObjectParser:
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
             type = self.findType(sheet.cell(rowx=row, colx=1).value)
+            content = []
+            col = 2
+            while col < sheet.ncols:
+                content.append(sheet.cell(rowx=row, colx=col).value)
+                col += 1
 
-            complexObjects.append(ComplexObject(name, type))
+            complexObjects.append(ComplexObject(name, type, content))
             row += 1
         return complexObjects
 
