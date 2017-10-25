@@ -20,10 +20,10 @@ ADVANCED:
 
 
 EXCEL FORMAT:
-- complex-types (name, size, shape, bg-color, backside)
-- shapes (pretty much freeform sizes; use column letters (starting with C) + 0)
-- complex-data (name, type-name, [content columns])
-- decks (name, card identifiers)
+V- complex-types (name, size, shape, bg-color, backside)
+V- shapes (pretty much freeform sizes; use column letters (starting with C) + 0)
+V- complex-data (name, type-name, [content columns])
+V- decks (name, card identifiers)
 V- tokens/markers (cubes, cylinders, triangles, coins, tokens) (name, shape, size, front-color, front-content, back-color?, back-content? )
 V- dice (name, color, sides, content?)
 V- playing field content (number of sectors, content per sector)
