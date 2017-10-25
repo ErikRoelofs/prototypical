@@ -7,6 +7,7 @@ from sheetParser.complexObjectParser import ComplexObjectParser
 from sheetParser.deckParser import DeckParser
 
 from drawer.deckDrawer import DeckDrawer
+from drawer.complexObjectDrawer import ComplexObjectDrawer
 
 from creator.entityCreator import EntityCreator
 
@@ -39,6 +40,12 @@ decks = DeckParser.parse(workbook.sheet_by_name('Decks'), complexObjects)
 drawer = DeckDrawer()
 for deck in decks:
     pygame.image.save(drawer.draw(deck), deck.name + ".jpg")
+
+# draw all the boards
+for obj in complexObjects:
+    if obj.type.type == 'board':
+        drawer = ComplexObjectDrawer(obj)
+        pygame.image.save(drawer.draw(), obj.name + ".jpg")
 
 # build all required entities
 creator = EntityCreator(tokens + dice + complexObjects + decks)

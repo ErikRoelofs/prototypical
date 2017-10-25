@@ -23,7 +23,7 @@ class Board():
             "GridProjection": False,
             "Hands": False,
             "CustomImage": {
-                "ImageURL": "file:///C:/Users/Pluisjen/Pictures/gradient.png",
+                "ImageURL": "file:///C:/workspace/prototyper/" + self.object.name + ".jpg",
                 "ImageSecondaryURL": "",
                 "WidthScale": 1.42857146
             },

@@ -38,7 +38,7 @@ class ComplexObjectDrawer:
         self.write(content, rect)
 
     def write(self, content, rect):
-        textSurfaceObj = self.fontObj.render(content, True, (255,0,0), (255,255,255))
+        textSurfaceObj = self.fontObj.render(str(content), True, (255,0,0), (255,255,255))
         textRectObj = textSurfaceObj.get_rect()
         textRectObj.left = rect[0]
         textRectObj.top = rect[1]
