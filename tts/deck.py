@@ -8,13 +8,15 @@ class Deck():
     def get_ids(self):
         ids = []
         for card in self.cards:
-            ids.append(99 + card.id)
+            for i in range(0, card.count):
+                ids.append(99 + card.id)
         return ids
 
     def get_cards(self):
         data = []
         for card in self.cards:
-            data.append(self.card_as_dict(card))
+            for i in range(0,card.count):
+                data.append(self.card_as_dict(card))
         return data
 
     def card_as_dict(self, card):
