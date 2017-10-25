@@ -44,13 +44,17 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
     # draw all the card decks
     drawer = DeckDrawer()
     for deck in decks:
-        pygame.image.save(drawer.draw(deck), deck.name + ".jpg")
+        path = imagesDir + '/' + deck.name + ".jpg"
+        pygame.image.save(drawer.draw(deck), path )
+        deck.setImagePath( path )
 
     # draw all the boards
     for obj in complexObjects:
         if obj.type.type == 'board':
+            path = imagesDir + '/' + obj.name + ".jpg"
             drawer = ComplexObjectDrawer(obj)
-            pygame.image.save(drawer.draw(), obj.name + ".jpg")
+            pygame.image.save(drawer.draw(), path )
+            obj.setImagePath(path)
 
     # build all required entities
     creator = EntityCreator(tokens + dice + complexObjects + decks)

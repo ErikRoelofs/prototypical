@@ -3,3 +3,7 @@ class ComplexObject:
         self.name = name
         self.type = type
         self.content = content
+        self.imagePath = ''
+
+    def setImagePath(self, path):
+        self.imagePath = path

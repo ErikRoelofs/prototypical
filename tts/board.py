@@ -23,7 +23,7 @@ class Board():
             "GridProjection": False,
             "Hands": False,
             "CustomImage": {
-                "ImageURL": "file:///C:/workspace/prototyper/" + self.object.name + ".jpg",
+                "ImageURL": 'file:///' + self.object.imagePath,
                 "ImageSecondaryURL": "",
                 "WidthScale": 1.42857146
             },

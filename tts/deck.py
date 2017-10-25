@@ -1,8 +1,9 @@
 class Deck():
-    def __init__(self, transform, name, cards):
+    def __init__(self, transform, name, cards, imagePath):
         self.transform = transform
         self.cards = cards
         self.name = name
+        self.imagePath = imagePath
 
     def get_ids(self):
         ids = []
@@ -66,7 +67,7 @@ class Deck():
                 'DeckIDs': self.get_ids(),
                 'CustomDeck': {
                     '1': {
-                        'FaceURL': 'file:///C:/workspace/prototyper/' + self.name + '.jpg',
+                        'FaceURL': 'file:///' + self.imagePath,
                         'BackURL': 'file:///C:/Users/Pluisjen/Pictures/gradient.png',
                         'NumWidth': 10,
                         'NumHeight': 7,
