@@ -18,7 +18,9 @@ def runTests():
     ComplexTypeParserTest().run()
 
 
-def buildFile(excelFile, imagesDir, saveDir):
+def buildFile(excelFile, imagesDir, saveDir, fileName):
+    print ("Building file!")
+
     # setup pygame as drawing library
     import pygame
     pygame.init()
@@ -26,7 +28,7 @@ def buildFile(excelFile, imagesDir, saveDir):
     # open save template
     with open('template.json', 'r') as infile:
         data = json.load(infile)
-
+        data['SaveName'] = fileName
     # open excel file
     workbook = xlrd.open_workbook(excelFile)
 
@@ -58,18 +60,21 @@ def buildFile(excelFile, imagesDir, saveDir):
     data["ObjectStates"] = entities
 
     # save file
-    with open(saveDir + '/TS_Save_3.json', 'w') as outfile:
+    with open(saveDir + '/TS_' + fileName.replace(' ', '_') + '.json', 'w') as outfile:
         json.dump(data, outfile)
 
 
 from tkinter import *
 from tkinter import filedialog
+from tkinter import simpledialog
+from tkinter import font
 
 class Config:
-    def __init__(self, excelFile, saveDir, imagesDir):
+    def __init__(self, excelFile, saveDir, imagesDir, fileName):
         self.excelFile = excelFile
         self.saveDir = saveDir
         self.imagesDir = imagesDir
+        self.fileName = fileName
         self.loadConfig()
 
     def setExcelFile(self):
@@ -84,8 +89,12 @@ class Config:
         self.imagesDir.set(filedialog.askdirectory (initialdir='~'))
         self.saveConfig()
 
+    def setFilename(self):
+        self.fileName.set(simpledialog.askstring("Filename?", "Enter the filename:"))
+        self.saveConfig()
+
     def readyToRun(self):
-        return self.excelFile and self.saveDir and self.imagesDir
+        return self.excelFile.get() and self.saveDir.get() and self.imagesDir.get() and self.fileName.get()
 
     def loadConfig(self):
         try:
@@ -94,6 +103,7 @@ class Config:
                 self.excelFile.set(data['e'])
                 self.saveDir.set(data['s'])
                 self.imagesDir.set(data['i'])
+                self.fileName.set(data['f'])
         except FileNotFoundError:
             return
 
@@ -101,7 +111,8 @@ class Config:
         data = {
             "e": self.excelFile.get(),
             "s": self.saveDir.get(),
-            "i": self.imagesDir.get()
+            "i": self.imagesDir.get(),
+            "f": self.fileName.get()
         }
         with open('settings.json', 'w') as outfile:
             json.dump(data, outfile)
@@ -109,47 +120,64 @@ class Config:
 
 class App:
     def __init__(self, master):
-        master.geometry("600x200")
-        self.config = Config(StringVar(), StringVar(), StringVar())
+        master.geometry("700x200")
+        self.filenameVar = StringVar()
+        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar)
 
         frame = Frame(master)
         frame.grid()
         frame.grid_columnconfigure(1, minsize=400)
 
-        self.button = Button(frame, text="QUIT", command=frame.quit)
-        self.button.grid(row=0, column=0, columnspan=2)
+        self.customFont = font.Font(family="Arial", size=18)
+        self.headerLabel = Label(frame, text="Prototypical!", font=self.customFont)
+        self.headerLabel.grid(row=0, column=0, columnspan=2)
 
         self.excelFile(frame)
         self.savedirFile(frame)
         self.imagedirFile(frame)
+        self.filename(frame)
 
-        self.buildButton= Button(frame, text="BUILD", command=self.build)
-        self.buildButton.grid(row=4, column=0, columnspan=2)
+        buttonFrame = Frame(frame)
+        buttonFrame.grid(row=5, column=1)
+
+        self.buildButton= Button(buttonFrame, text="BUILD", command=self.build)
+        self.buildButton.grid(row=0, column=0)
+
+        self.button = Button(buttonFrame, text="QUIT", command=frame.quit)
+        self.button.grid(row=0, column=1)
+
 
     def excelFile(self, frame):
-        self.excelButton = Button(frame, text="SET EXCEL FILE", command=self.config.setExcelFile)
+        self.excelButton = Button(frame, text="SET EXCEL FILE", command=self.config.setExcelFile, width=30)
         self.excelButton.grid(row=1, column=0)
 
         self.excelText = Label(frame, textvariable=self.config.excelFile)
         self.excelText.grid(row=1, column=1)
 
     def savedirFile(self, frame):
-        self.savedirButton = Button(frame, text="SET SAVE DIR", command=self.config.setSaveDir)
+        self.savedirButton = Button(frame, text="SET SAVE DIR", command=self.config.setSaveDir, width=30)
         self.savedirButton.grid(row=2, column=0)
 
         self.savedirText = Label(frame, textvariable=self.config.saveDir)
         self.savedirText.grid(row=2, column=1)
 
     def imagedirFile(self, frame):
-        self.imagedirButton = Button(frame, text="SET IMAGEDIR FILE", command=self.config.setImagesDir)
+        self.imagedirButton = Button(frame, text="SET IMAGEDIR FILE", command=self.config.setImagesDir, width=30)
         self.imagedirButton.grid(row=3, column=0)
 
         self.imagedirText = Label(frame, textvariable=self.config.imagesDir)
         self.imagedirText.grid(row=3, column=1)
 
+    def filename(self, frame):
+        self.filenameButton = Button(frame, text="SET FILENAME", command=self.config.setFilename, width=30)
+        self.filenameButton.grid(row=4, column=0)
+
+        self.filenameText = Label(frame, textvariable=self.config.fileName)
+        self.filenameText.grid(row=4, column=1)
+
     def build(self):
         if self.config.readyToRun():
-            buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get())
+            buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(), self.config.fileName.get())
 
 
 root = Tk()
