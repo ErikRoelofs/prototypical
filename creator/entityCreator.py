@@ -1,9 +1,11 @@
 import random
 from domain.token import Token
 from domain.die import Die
+from domain.deck import Deck
 from tts.blocksquare import BlockSquare
 from tts.transform import Transform
 from tts.die import Die as TTSDie
+from tts.deck import Deck as TTSDeck
 
 XMIN = -27
 XMAX = 27
@@ -33,6 +35,8 @@ class EntityCreator:
             return self.placeToken(coords, entity)
         if isinstance(entity, Die):
             return self.placeDie(coords, entity)
+        if isinstance(entity, Deck):
+            return self.placeDeck(coords, entity)
 
     def placeToken(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
@@ -43,6 +47,11 @@ class EntityCreator:
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
         die = TTSDie(entity.sides, entity.color, transform)
         return die.as_dict()
+
+    def placeDeck(self, coords, entity):
+        transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, 1,1,1)
+        deck = TTSDeck(transform, entity.name, entity.cards)
+        return deck.as_dict()
 
     def createEntities(self, sheet):
         chunksWide = sheet.cell(rowx=0, colx=1).value

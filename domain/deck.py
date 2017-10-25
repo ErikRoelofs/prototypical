@@ -3,5 +3,8 @@ class Deck:
         self.name = name
         self.cards = []
 
-    def addCard(self, card, count):
-        self.cards.append((card, count))
+    def addCard(self, card):
+        self.cards.append(card)
+
+    def nextId(self):
+        return len(self.cards)+1
