@@ -40,12 +40,9 @@ drawer = DeckDrawer()
 for deck in decks:
     pygame.image.save(drawer.draw(deck), deck.name + ".jpg")
 
-
 # build all required entities
 creator = EntityCreator(tokens + dice + complexObjects + decks)
 entities = creator.createEntities(workbook.sheet_by_name('Placement'))
-
-
 
 # add entities to save file
 data["ObjectStates"] = entities

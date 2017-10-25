@@ -18,15 +18,16 @@ class ComplexTypeParser:
 
             bgColor = read_color(sheet.cell(rowx=row, colx=4).value)
             backside = read_color(sheet.cell(rowx=row, colx=5).value)
-            complexTypes.append(ComplexType(name, size, shape, bgColor, backside))
+            type = sheet.cell(rowx=row, colx=6).value
+            complexTypes.append(ComplexType(name, size, shape, bgColor, backside, type))
             row += 1
         return complexTypes
 
     def parseShape(shapeSheet, topLeft, bottomRight):
-        firstRow = topLeft[0]
-        firstCol = topLeft[1]
-        lastRow = bottomRight[0]
-        lastCol = bottomRight[1]
+        firstRow = topLeft[1]
+        firstCol = topLeft[0]
+        lastRow = bottomRight[1]
+        lastCol = bottomRight[0]
 
         rows = []
         for row in range(firstRow, lastRow + 1):

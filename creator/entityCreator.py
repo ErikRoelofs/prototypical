@@ -2,16 +2,19 @@ import random
 from domain.token import Token
 from domain.die import Die
 from domain.deck import Deck
+from domain.complexObject import ComplexObject
 from tts.blocksquare import BlockSquare
 from tts.transform import Transform
 from tts.die import Die as TTSDie
 from tts.deck import Deck as TTSDeck
+from tts.board import Board as TTSBoard
 
 XMIN = -27
 XMAX = 27
 ZMIN = -17
 ZMAX = 17
-YHEIGHT = 1.5
+YHEIGHT = 2
+BOARDYHEIGHT = 1
 
 
 class EntityCreator:
@@ -37,6 +40,12 @@ class EntityCreator:
             return self.placeDie(coords, entity)
         if isinstance(entity, Deck):
             return self.placeDeck(coords, entity)
+        if isinstance(entity, ComplexObject):
+            if entity.type.type == 'board':
+                return self.placeBoard(coords, entity)
+            else:
+                raise ValueError("Only ComplexTypes of the 'board' type can be placed directly. The others go into a deck!")
+        raise NotImplementedError("Not sure what to do with this: " + entity.__class__.__name__)
 
     def placeToken(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
@@ -49,9 +58,14 @@ class EntityCreator:
         return die.as_dict()
 
     def placeDeck(self, coords, entity):
-        transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, 1,1,1)
+        transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 180, 1,1,1)
         deck = TTSDeck(transform, entity.name, entity.cards)
         return deck.as_dict()
+
+    def placeBoard(self, coords, entity):
+        transform = Transform(coords[0], BOARDYHEIGHT, coords[1], 0, 0, 0, 1, 1, 1)
+        board = TTSBoard(transform, entity)
+        return board.as_dict()
 
     def createEntities(self, sheet):
         chunksWide = sheet.cell(rowx=0, colx=1).value
