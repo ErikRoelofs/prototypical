@@ -38,6 +38,8 @@ class ComplexObjectDrawer:
         self.write(content, rect)
 
     def write(self, content, rect):
+        if isinstance(content, float) and content.is_integer():
+            content = int(content)
         textSurfaceObj = self.fontObj.render(str(content), True, (255,0,0), (255,255,255))
         textRectObj = textSurfaceObj.get_rect()
         textRectObj.left = rect[0]
