@@ -3,7 +3,7 @@ from domain.token import Token
 from domain.die import Die
 from domain.deck import Deck
 from domain.complexObject import ComplexObject
-from tts.blocksquare import BlockSquare
+from tts.simpletoken import SimpleToken
 from tts.transform import Transform
 from tts.die import Die as TTSDie
 from tts.deck import Deck as TTSDeck
@@ -49,7 +49,7 @@ class EntityCreator:
 
     def placeToken(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
-        bs = BlockSquare(transform, entity.color)
+        bs = SimpleToken(entity.entity, transform, entity.color)
         return bs.as_dict()
 
     def placeDie(self, coords, entity):

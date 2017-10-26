@@ -1,12 +1,21 @@
-class BlockSquare():
+class SimpleToken():
 
-    def __init__(self, transform, color):
+    def __init__(self, typename, transform, color):
+        self.typename = typename
         self.transform = transform
         self.color = color
 
+    def get_tts_name(self):
+        if self.typename.lower() == 'cube':
+            return 'BlockSquare'
+        elif self.typename.lower() == 'pawn':
+            return 'PlayerPawn'
+        else:
+            raise ValueError("Unknown entity type: " + self.typename)
+
     def as_dict(self):
         return {
-            'Name': 'BlockSquare',
+            'Name': self.get_tts_name(),
             'Transform': self.transform.as_dict(),
             'Nickname': '',
             'Description': '',
