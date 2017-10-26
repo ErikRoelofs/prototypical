@@ -1,5 +1,7 @@
 import pygame
 
+from drawer.textrect import render_textrect
+
 CARD_WIDTH = 400
 CARD_HEIGHT = 600
 
@@ -40,8 +42,11 @@ class ComplexObjectDrawer:
     def write(self, content, rect):
         if isinstance(content, float) and content.is_integer():
             content = int(content)
-        textSurfaceObj = self.fontObj.render(str(content), True, (255,0,0), (255,255,255))
-        textRectObj = textSurfaceObj.get_rect()
-        textRectObj.left = rect[0]
-        textRectObj.top = rect[1]
-        self.surf.blit(textSurfaceObj, textRectObj)
+        surf = render_textrect(str(content), self.fontObj, rect, (0,0,0), (255,255,255))
+        self.surf.blit(surf, rect)
+
+        #textSurfaceObj = self.fontObj.render(str(content), True, (255,0,0), (255,255,255))
+        #textRectObj = textSurfaceObj.get_rect()
+        #textRectObj.left = rect[0]
+        #textRectObj.top = rect[1]
+        #self.surf.blit(textSurfaceObj, textRectObj)
