@@ -45,7 +45,7 @@ class ComplexTypeParser:
         for rowNum, row in enumerate(rows):
             for colNum, char in enumerate(row):
                 ComplexTypeParser.validateAllowed(char, rowNum, colNum, areas)
-                if char == '0':
+                if char == 0.0:
                     continue
                 if char in areas:
                     areas[char] = ComplexTypeParser.updateArea(areas[char], rowNum, colNum)
@@ -83,4 +83,7 @@ class ComplexTypeParser:
 
     def reduceChar(char):
         # because 'c' is 0, a and b are reserved
-        return ord(char) - 99
+        if len(char) == 1:
+            return ord(char) - 99
+        else:
+            return ord(char[1]) + 26
