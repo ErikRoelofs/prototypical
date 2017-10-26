@@ -2,3 +2,6 @@
 .~*
 TS_Save_3.json
 *pycache*
+*.xls
+*.xls#
+settings.json
