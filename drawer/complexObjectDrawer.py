@@ -3,16 +3,10 @@ import pygame
 from drawer.textrect import render_textrect
 from drawer.color import convert_tts_to_pygame
 
-CARD_WIDTH = 400
-CARD_HEIGHT = 600
-
 EDGE_MARGIN = 25
 
 LEFTRIGHT_MARGIN = 10
 TOPBOTTOM_MARGIN = 10
-
-DRAWABLE_WIDTH = CARD_WIDTH - (2*EDGE_MARGIN)
-DRAWABLE_HEIGHT = CARD_HEIGHT - (2*EDGE_MARGIN)
 
 class ComplexObjectDrawer:
 
@@ -22,15 +16,19 @@ class ComplexObjectDrawer:
         self.fontObj = pygame.font.Font('freesansbold.ttf', 32)
 
     def draw(self):
-        self.surf = pygame.Surface((CARD_WIDTH - 2 * EDGE_MARGIN,CARD_HEIGHT - 2 * EDGE_MARGIN))
+        w, h = self.getCardSize()
+        self.surf = pygame.Surface((w - 2 * EDGE_MARGIN,h - 2 * EDGE_MARGIN))
         self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
         for key, content in enumerate(self.object.content):
             if key in self.object.type.shape.areas:
                 self.drawContentToArea(content, self.object.type.shape.areas[key])
-        self.fullSurf = pygame.Surface((CARD_WIDTH, CARD_HEIGHT))
+        self.fullSurf = pygame.Surface((w, h))
         self.fullSurf.fill(convert_tts_to_pygame(self.object.type.bgColor))
         self.fullSurf.blit(self.surf, (EDGE_MARGIN, EDGE_MARGIN))
         return self.fullSurf
+
+    def getCardSize(self):
+        return (400, 600)
 
     def getShapeSize(self, shape):
         height = 0
@@ -44,11 +42,14 @@ class ComplexObjectDrawer:
 
     # note: areas in the shape are actually row, col and not x,y
     def drawContentToArea(self, content, area):
+        w, h = self.getCardSize()
+        dw = w - (2*EDGE_MARGIN)
+        dh = h - (2*EDGE_MARGIN)
         rect = pygame.Rect(
-            LEFTRIGHT_MARGIN + area[1] * DRAWABLE_WIDTH / self.size[0],
-            TOPBOTTOM_MARGIN + area[0] * DRAWABLE_HEIGHT / self.size[1],
-            (area[3]+1) * DRAWABLE_WIDTH / self.size[0] - LEFTRIGHT_MARGIN,
-            (area[2]+1) * DRAWABLE_HEIGHT / self.size[1] - TOPBOTTOM_MARGIN
+            LEFTRIGHT_MARGIN + area[1] * dw / self.size[0],
+            TOPBOTTOM_MARGIN + area[0] * dh / self.size[1],
+            (area[3]+1) * dw / self.size[0] - LEFTRIGHT_MARGIN,
+            (area[2]+1) * dh / self.size[1] - TOPBOTTOM_MARGIN
         )
         self.write(content, rect)
 

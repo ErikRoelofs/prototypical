@@ -1,12 +1,14 @@
 import pygame
-import drawer.complexObjectDrawer
+from drawer.complexObjectDrawer import ComplexObjectDrawer
 
 class DeckDrawer:
-    def __init__(self):
-        self.size = (drawer.complexObjectDrawer.CARD_WIDTH * 10, drawer.complexObjectDrawer.CARD_HEIGHT * 7)
-        self.cardSize = (drawer.complexObjectDrawer.CARD_WIDTH, drawer.complexObjectDrawer.CARD_HEIGHT)
 
     def draw(self, deck):
+        drawer = ComplexObjectDrawer(deck.cards[0].object)
+        w, h = drawer.getCardSize()
+        self.size = (w * 10, h * 7)
+        self.cardSize = (w, h)
+
         surf = pygame.Surface(self.size)
         self.drawCards(surf, deck.cards)
         return surf
@@ -15,7 +17,7 @@ class DeckDrawer:
         done = 0
         for i in range(0,7):
             for j in range(0,10):
-                cardDrawer = drawer.complexObjectDrawer.ComplexObjectDrawer(cards[done].object)
+                cardDrawer = ComplexObjectDrawer(cards[done].object)
                 surf.blit(cardDrawer.draw(), (j * self.cardSize[0], i * self.cardSize[1]))
                 done += 1
                 if done == len(cards):
