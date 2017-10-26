@@ -5,3 +5,4 @@ TS_Save_3.json
 *.xls
 *.xls#
 settings.json
+*.pyc

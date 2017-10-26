@@ -1,4 +1,4 @@
-import pygame, random
+import pygame
 
 from drawer.textrect import render_textrect
 from drawer.color import convert_tts_to_pygame

@@ -1,6 +1,6 @@
 from domain.complexType import ComplexType
 from domain.shape import Shape
-from reader.color import read_color
+from reader.color import ColorReader
 from reader.cell import read_cell
 
 class ComplexTypeParser:
@@ -16,8 +16,8 @@ class ComplexTypeParser:
 
             shape = ComplexTypeParser.parseShape(shapeSheet, topLeft, bottomRight)
 
-            bgColor = read_color(sheet.cell(rowx=row, colx=4).value)
-            backside = read_color(sheet.cell(rowx=row, colx=5).value)
+            bgColor = ColorReader.read_color(sheet.cell(rowx=row, colx=4).value)
+            backside = ColorReader.read_color(sheet.cell(rowx=row, colx=5).value)
             type = sheet.cell(rowx=row, colx=6).value
             complexTypes.append(ComplexType(name, size, shape, bgColor, backside, type))
             row += 1

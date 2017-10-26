@@ -1,4 +1,4 @@
-from reader.color import read_color
+from reader.color import ColorReader
 from domain.token import Token
 
 
@@ -9,7 +9,7 @@ class TokenParser:
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
             entity = sheet.cell(rowx=row, colx=1).value
-            color = read_color(sheet.cell(rowx=row, colx=2).value)
+            color = ColorReader.read_color(sheet.cell(rowx=row, colx=2).value)
             size = sheet.cell(rowx=row, colx=3).value
             tokens.append(Token(name, entity, color, size))
             row += 1
