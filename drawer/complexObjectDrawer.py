@@ -28,7 +28,7 @@ class ComplexObjectDrawer:
         return self.fullSurf
 
     def getCardSize(self):
-        return (400, 600)
+        return self.object.type.size
 
     def getShapeSize(self, shape):
         height = 0

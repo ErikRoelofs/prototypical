@@ -2,6 +2,7 @@ from domain.complexType import ComplexType
 from domain.shape import Shape
 from reader.color import ColorReader
 from reader.cell import read_cell
+from reader.dimensions import read_dimensions
 
 class ComplexTypeParser:
     def parse(sheet, shapeSheet):
@@ -9,7 +10,7 @@ class ComplexTypeParser:
         row = 1
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
-            size = sheet.cell(rowx=row, colx=1).value
+            size = read_dimensions(sheet.cell(rowx=row, colx=1).value)
 
             topLeft = read_cell(sheet.cell(rowx=row, colx=2).value)
             bottomRight = read_cell(sheet.cell(rowx=row, colx=3).value)
