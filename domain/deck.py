@@ -3,6 +3,7 @@ class Deck:
         self.name = name
         self.cards = []
         self.imagePath = ''
+        self.backImagePath = ''
 
     def addCard(self, card):
         self.cards.append(card)
@@ -13,5 +14,5 @@ class Deck:
     def setImagePath(self, path):
         self.imagePath = path
 
-    def imagePathAsUrl(self):
-        return 1
+    def setBackImagePath(self, path):
+        self.backImagePath = path

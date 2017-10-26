@@ -8,6 +8,7 @@ from sheetParser.deckParser import DeckParser
 
 from drawer.deckDrawer import DeckDrawer
 from drawer.complexObjectDrawer import ComplexObjectDrawer
+from drawer.cardBackDrawer import CardBackDrawer
 
 from creator.entityCreator import EntityCreator
 
@@ -47,6 +48,13 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
         path = imagesDir + '/' + deck.name + ".jpg"
         pygame.image.save(drawer.draw(deck), path )
         deck.setImagePath( path )
+
+    # draw all the deck backs
+    drawer = CardBackDrawer()
+    for deck in decks:
+        path = imagesDir + '/' + deck.name + "_back.jpg"
+        pygame.image.save(drawer.draw(deck), path)
+        deck.setBackImagePath(path)
 
     # draw all the boards
     for obj in complexObjects:
