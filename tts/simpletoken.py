@@ -10,6 +10,8 @@ class SimpleToken():
             return 'BlockSquare'
         elif self.typename.lower() == 'pawn':
             return 'PlayerPawn'
+        elif self.typename.lower() == 'triangle':
+            return 'BlockTriangle'
         else:
             raise ValueError("Unknown entity type: " + self.typename)
 
