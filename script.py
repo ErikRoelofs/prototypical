@@ -9,10 +9,13 @@ from sheetParser.deckParser import DeckParser
 from drawer.deckDrawer import DeckDrawer
 from drawer.complexObjectDrawer import ComplexObjectDrawer
 from drawer.cardBackDrawer import CardBackDrawer
+from drawer.tokenDrawer import TokenDrawer
 
 from creator.entityCreator import EntityCreator
 
 from tests.complexTypeParserTest import ComplexTypeParserTest
+
+from domain.token import ContentToken
 
 def runTests():
     # run test cases
@@ -63,6 +66,14 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
             drawer = ComplexObjectDrawer(obj)
             pygame.image.save(drawer.draw(), path )
             obj.setImagePath(path)
+
+    # draw all the (custom) tokens
+    for token in tokens:
+        if isinstance(token, ContentToken):
+            path = imagesDir + '/token_' + token.name + ".jpg"
+            drawer = TokenDrawer(token)
+            pygame.image.save(drawer.draw(), path)
+            token.setImagePath(path)
 
     # build all required entities
     creator = EntityCreator(tokens + dice + complexObjects + decks)

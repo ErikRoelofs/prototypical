@@ -1,5 +1,6 @@
 import random
 from domain.token import Token
+from domain.token import ContentToken
 from domain.die import Die
 from domain.deck import Deck
 from domain.complexObject import ComplexObject
@@ -8,6 +9,7 @@ from tts.transform import Transform
 from tts.die import Die as TTSDie
 from tts.deck import Deck as TTSDeck
 from tts.board import Board as TTSBoard
+from tts.token import Token as TTSToken
 
 XMIN = -27
 XMAX = 27
@@ -48,9 +50,14 @@ class EntityCreator:
         raise NotImplementedError("Not sure what to do with this: " + entity.__class__.__name__)
 
     def placeToken(self, coords, entity):
-        transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
-        bs = SimpleToken(entity.entity, transform, entity.color)
-        return bs.as_dict()
+        if isinstance(entity, ContentToken):
+            transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 0, 0.1,0.1,0.1)
+            bs = TTSToken(transform, entity.imagePath)
+            return bs.as_dict()
+        else:
+            transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
+            bs = SimpleToken(entity.entity, transform, entity.color)
+            return bs.as_dict()
 
     def placeDie(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
