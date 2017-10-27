@@ -11,6 +11,8 @@ from tts.deck import Deck as TTSDeck
 from tts.board import Board as TTSBoard
 from tts.token import Token as TTSToken
 
+from reader.number import read_number
+
 XMIN = -27
 XMAX = 27
 ZMIN = -17
@@ -24,6 +26,11 @@ class EntityCreator:
         self.library = library
 
     def getCoordInChunk(self, chunkX, chunkY, numXChunks, numYChunks):
+        if not 0 <= chunkX < numXChunks:
+            raise ValueError("Trying to place an object outside the playing field; x-coordinates should be between 0 and " + str(int(numXChunks - 1)))
+        if not 0 <= chunkY < numYChunks:
+            raise ValueError("Trying to place an object outside the playing field; y-coordinates should be between 0 and " + str(int(numYChunks - 1)))
+
         width = (XMAX - XMIN) / numXChunks
         height = (ZMAX - ZMIN) / numYChunks
         xOffset = random.uniform(0, width)
@@ -34,6 +41,7 @@ class EntityCreator:
         for type in self.library:
             if type.name == name:
                 return type
+        raise ValueError("Unknown entity type: " + name)
 
     def createEntity(self, coords, entity):
         if isinstance(entity, Token):
@@ -46,7 +54,7 @@ class EntityCreator:
             if entity.type.type == 'board':
                 return self.placeBoard(coords, entity)
             else:
-                raise ValueError("Only ComplexTypes of the 'board' type can be placed directly. The others go into a deck!")
+                raise ValueError("Only ComplexTypes of the 'board' type can be placed directly. The others go into a deck! (Tried placing a " + entity.name + ")")
         raise NotImplementedError("Not sure what to do with this: " + entity.__class__.__name__)
 
     def placeToken(self, coords, entity):
@@ -84,10 +92,16 @@ class EntityCreator:
             yChunk = sheet.cell(rowx=row, colx=1).value
             col = 2
             while col < sheet.ncols and col < 10:
-                numToPlace = sheet.cell(rowx=row, colx=col).value
+                try:
+                    numToPlace = read_number(sheet.cell(rowx=row, colx=col).value)
+                except ValueError as e:
+                    raise ValueError(str(e) + " (while trying to place items on the board)")
                 if numToPlace:
                     typeToPlace = sheet.cell(rowx=row, colx=col + 1).value
-                    object = self.findObjectByName(typeToPlace)
+                    try:
+                        object = self.findObjectByName(typeToPlace)
+                    except ValueError as e:
+                        raise ValueError(str(e) + " (while trying to place items on the board)")
                     for i in range(0, int(numToPlace)):
                         entities.append(self.createEntity(self.getCoordInChunk(xChunk, yChunk, chunksWide, chunksHigh), object))
                 col += 2

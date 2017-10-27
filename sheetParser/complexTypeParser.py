@@ -3,6 +3,7 @@ from domain.shape import Shape
 from reader.color import ColorReader
 from reader.cell import read_cell
 from reader.dimensions import read_dimensions
+from reader.fromlist import read_fromlist
 
 class ComplexTypeParser:
     def parse(sheet, shapeSheet):
@@ -10,19 +11,29 @@ class ComplexTypeParser:
         row = 1
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
-            size = read_dimensions(sheet.cell(rowx=row, colx=1).value)
+            try:
+                size = read_dimensions(sheet.cell(rowx=row, colx=1).value)
+            except ValueError as e:
+                raise ValueError(str(e) + "(while reading size for " + name + ")") from None
 
-            topLeft = read_cell(sheet.cell(rowx=row, colx=2).value)
-            bottomRight = read_cell(sheet.cell(rowx=row, colx=3).value)
+            try:
+                topLeft = read_cell(sheet.cell(rowx=row, colx=2).value)
+                bottomRight = read_cell(sheet.cell(rowx=row, colx=3).value)
+            except ValueError as e:
+                raise ValueError(str(e) + "(while reading shape for " + name + ")") from None
 
             try:
                 shape = ComplexTypeParser.parseShape(shapeSheet, topLeft, bottomRight)
             except ValueError as e:
-                raise ValueError(str(e) + " (while reading shape for " + name + ")")
+                raise ValueError(str(e) + " (while reading shape for " + name + ")") from None
 
             bgColor = ColorReader.read_color(sheet.cell(rowx=row, colx=4).value)
             backside = ColorReader.read_color(sheet.cell(rowx=row, colx=5).value)
-            type = sheet.cell(rowx=row, colx=6).value
+            try:
+                type = read_fromlist(sheet.cell(rowx=row, colx=6).value, ("card", "board"))
+            except ValueError as e:
+                raise ValueError(str(e) + " (while reading: " + name + ")") from None
+
             complexTypes.append(ComplexType(name, size, shape, bgColor, backside, type))
             row += 1
         return complexTypes

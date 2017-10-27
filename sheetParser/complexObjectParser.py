@@ -24,3 +24,4 @@ class ComplexObjectParser:
         for type in self.types:
             if type.name == name:
                 return type
+        raise ValueError("The ComplexType `" + name + "` does not exist.") from None

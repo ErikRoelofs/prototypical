@@ -1,5 +1,6 @@
 from reader.color import ColorReader
 from domain.die import Die
+from reader.number import read_float
 
 class DiceParser:
     def parse(sheet):
@@ -7,12 +8,15 @@ class DiceParser:
         row = 1
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
-            color = ColorReader.read_color(sheet.cell(rowx=row, colx=1).value)
-            size = sheet.cell(rowx=row, colx=2).value
+            try:
+                color = ColorReader.read_color(sheet.cell(rowx=row, colx=1).value)
+                size = read_float(sheet.cell(rowx=row, colx=2).value)
+            except ValueError as e:
+                raise ValueError(str(e) + " (while reading " + name + ")") from None
             sides = sheet.cell(rowx=row, colx=3).value
 
             customContent = None
-            if sides == 6 and sheet.cell(rowx=row, colx=4).value:
+            if sheet.cell(rowx=row, colx=4).value:
                 customContent = [
                     sheet.cell(rowx=row, colx=4).value,
                     sheet.cell(rowx=row, colx=5).value,
@@ -22,6 +26,9 @@ class DiceParser:
                     sheet.cell(rowx=row, colx=9).value,
                 ]
 
-            dice.append(Die(name, color, size, sides, customContent))
+            try:
+                dice.append(Die(name, color, size, sides, customContent))
+            except ValueError as e:
+                raise ValueError(str(e) + " (while reading " + name + ")") from None
             row += 1
         return dice
