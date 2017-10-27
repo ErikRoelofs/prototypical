@@ -206,14 +206,11 @@ class App:
         buttonFrame = Frame(frame)
         buttonFrame.grid(row=5, column=1)
 
-        self.buildButton= Button(buttonFrame, text="BUILD", command=self.build)
+        self.buildButton= Button(buttonFrame, text="BUILD GAME", command=self.build)
         self.buildButton.grid(row=0, column=0)
 
-        self.button = Button(buttonFrame, text="QUIT", command=frame.quit)
-        self.button.grid(row=0, column=1)
-
         self.newTemplateButton = Button(buttonFrame, text="NEW TEMPLATE", command=self.template)
-        self.newTemplateButton.grid(row=0, column=2)
+        self.newTemplateButton.grid(row=0, column=1)
 
         self.statusLabel = Label(frame, text="Status:")
         self.statusLabel.grid(row=6, column=0, columnspan=2)
