@@ -91,7 +91,7 @@ class EntityCreator:
             xChunk = sheet.cell(rowx=row, colx=0).value
             yChunk = sheet.cell(rowx=row, colx=1).value
             col = 2
-            while col < sheet.ncols and col < 10:
+            while col < sheet.ncols:
                 if sheet.cell(rowx=row, colx=col).value == '':
                     col += 2;
                     continue
