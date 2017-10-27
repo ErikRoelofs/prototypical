@@ -15,7 +15,10 @@ class ComplexTypeParser:
             topLeft = read_cell(sheet.cell(rowx=row, colx=2).value)
             bottomRight = read_cell(sheet.cell(rowx=row, colx=3).value)
 
-            shape = ComplexTypeParser.parseShape(shapeSheet, topLeft, bottomRight)
+            try:
+                shape = ComplexTypeParser.parseShape(shapeSheet, topLeft, bottomRight)
+            except ValueError as e:
+                raise ValueError(str(e) + " (while reading shape for " + name + ")")
 
             bgColor = ColorReader.read_color(sheet.cell(rowx=row, colx=4).value)
             backside = ColorReader.read_color(sheet.cell(rowx=row, colx=5).value)
@@ -56,15 +59,15 @@ class ComplexTypeParser:
     def validateAllowed(char, rowNum, colNum, areas):
         if char in areas:
             if areas[char][1] > colNum:
-                raise ValueError("Malformed Shape: trying to extend " + char + " to the left, that means this shape is not a rectangle!")
+                raise ValueError("Malformed Shape: trying to extend `" + char + "` to the left, that means this shape is not a rectangle!")
             if colNum > areas[char][3] and areas[char][0] != areas[char][2]:
-                raise ValueError("Malformed shape: trying to extend " + char + " to the right, but already on a second row. This shape is not a rectangle!")
+                raise ValueError("Malformed shape: trying to extend `" + char + "` to the right, but already on a second row. This shape is not a rectangle!")
             if areas[char][2]+1 < rowNum:
-                raise ValueError("Malformed shape: trying to extend " + char + " down by two rows at once. This shape is not a rectangle!")
+                raise ValueError("Malformed shape: trying to extend `" + char + "` down by two rows at once. This shape is not a rectangle!")
         for charKey, area in areas.items():
             if charKey != char:
                 if rowNum == area[2] and area[1] < colNum < area[3]:
-                    raise ValueError("Malformed shape: a " + char + " is inside an area already claimed by " + charKey + ". This shape is not a rectangle!")
+                    raise ValueError("Malformed shape: a `" + char + "` is inside an area already claimed by `" + charKey + "`. This shape is not a rectangle!")
         return True
 
     # will expand the size of this area to include the new cell (if required)
