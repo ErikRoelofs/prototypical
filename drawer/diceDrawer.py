@@ -1,5 +1,4 @@
 import pygame
-from drawer.color import convert_tts_to_pygame
 
 # 2,4,5
 # 1,3,6 (1 and 6 are upside down)
@@ -22,7 +21,8 @@ DRAWSPOTS = [
 class DiceDrawer:
     def __init__(self, die):
         self.die = die
-        self.fontObj = pygame.font.Font('freesansbold.ttf', 256)
+        self.largeFontObj = pygame.font.Font('freesansbold.ttf', 256)
+        self.smallFontObj = pygame.font.Font('freesansbold.ttf', 96)
 
     def draw(self):
         surf = pygame.image.load('D6.png')
@@ -30,8 +30,12 @@ class DiceDrawer:
             content = self.die.customContent[pos]
             if isinstance(content, float) and content.is_integer():
                 content = int(content)
+            content = str(content)
 
-            text = self.fontObj.render(str(content), True, (0,0,0), (255,255,255))
+            if len(content) > 2:
+                text = self.smallFontObj.render(str(content), True, (0,0,0), (255,255,255))
+            else:
+                text = self.largeFontObj.render(str(content), True, (0, 0, 0), (255, 255, 255))
             rect = text.get_rect(center=(WIDTH/2,HEIGHT/2))
 
             drawSurf = pygame.Surface((WIDTH, HEIGHT))
