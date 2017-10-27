@@ -7,7 +7,7 @@ class ColorReader():
     @staticmethod
     def init():
         ColorReader.colors = {}
-        workbook = xlrd.open_workbook('colors.xls')
+        workbook = xlrd.open_workbook('data/colors.xls')
         sheet = workbook.sheet_by_index(0)
         for i in range(0, sheet.nrows):
             colorName = sheet.cell(rowx=i, colx=0).value

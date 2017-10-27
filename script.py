@@ -30,7 +30,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     pygame.init()
 
     # open save template
-    with open('template.json', 'r') as infile:
+    with open('data/template.json', 'r') as infile:
         data = json.load(infile)
         data['SaveName'] = fileName
 
@@ -212,6 +212,9 @@ class App:
         self.button = Button(buttonFrame, text="QUIT", command=frame.quit)
         self.button.grid(row=0, column=1)
 
+        self.newTemplateButton = Button(buttonFrame, text="NEW TEMPLATE", command=self.template)
+        self.newTemplateButton.grid(row=0, column=2)
+
         self.statusLabel = Label(frame, text="Status:")
         self.statusLabel.grid(row=6, column=0, columnspan=2)
 
@@ -246,6 +249,17 @@ class App:
 
         self.filenameText = Label(frame, textvariable=self.config.fileName)
         self.filenameText.grid(row=4, column=1)
+
+    def template(self):
+        file = filedialog.asksaveasfilename()
+        if file:
+            import os, sys
+            from shutil import copyfile
+            path = file + ".xls"
+            copyfile("data/template.xls", path)
+            self.pushStatusMessage("Created a new empty template: " + path)
+            if sys.platform == 'win32':
+                os.startfile(path)
 
     def build(self):
         if self.config.readyToRun():
