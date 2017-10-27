@@ -259,12 +259,14 @@ class App:
                 raise e
 
     def pushErrorMessage(self, e):
+        import traceback
         self.pushStatusMessage("\n")
         index = self.status.index(INSERT)
         curline = index.split('.')[0]
         self.pushStatusMessage("\nUh oh, there was a problem while building:")
         self.status.tag_add("error", str(int(curline) + 1) + ".0", str(int(curline) + 2) + ".0")
         self.pushStatusMessage(str(e))
+        self.pushStatusMessage("\n" + traceback.format_exc())
 
     def pushStatusMessage(self, msg, newline=True):
         self.status.insert(END, msg + ("\n" if newline else ''))
