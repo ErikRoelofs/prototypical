@@ -61,7 +61,7 @@ class EntityCreator:
 
     def placeDie(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
-        die = TTSDie(entity.sides, entity.color, transform, entity.customContent)
+        die = TTSDie(entity.sides, entity.color, transform, entity.customContent, entity.imagePath)
         return die.as_dict()
 
     def placeDeck(self, coords, entity):

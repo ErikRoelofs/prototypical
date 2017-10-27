@@ -10,6 +10,7 @@ from drawer.deckDrawer import DeckDrawer
 from drawer.complexObjectDrawer import ComplexObjectDrawer
 from drawer.cardBackDrawer import CardBackDrawer
 from drawer.tokenDrawer import TokenDrawer
+from drawer.diceDrawer import DiceDrawer
 
 from creator.entityCreator import EntityCreator
 
@@ -74,6 +75,14 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
             drawer = TokenDrawer(token)
             pygame.image.save(drawer.draw(), path)
             token.setImagePath(path)
+
+    # draw all dice
+    for die in dice:
+        if die.customContent:
+            path = imagesDir + '/die_' + die.name + ".png"
+            drawer = DiceDrawer(die)
+            pygame.image.save(drawer.draw(), path)
+            die.setImagePath(path)
 
     # build all required entities
     creator = EntityCreator(tokens + dice + complexObjects + decks)

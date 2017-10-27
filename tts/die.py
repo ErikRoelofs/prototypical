@@ -1,9 +1,10 @@
 class Die():
-    def __init__(self, sides, color, transform, customContent = None):
+    def __init__(self, sides, color, transform, customContent = None, imagePath = None):
         self.sides = sides
         self.color = color
         self.transform = transform
         self.customContent = customContent
+        self.imagePath = imagePath
 
     def as_dict(self):
         base = {
@@ -42,7 +43,7 @@ class Die():
 
     def customDice(self):
         return {
-            "ImageURL": "file:///C:/Users/Pluisjen/Pictures/prototypical/D6.png",
+            "ImageURL": "file:///" + self.imagePath,
             "ImageSecondaryURL": "",
             "WidthScale": 0.0,
             "CustomDice": {
