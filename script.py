@@ -23,8 +23,7 @@ def runTests():
     ComplexTypeParserTest().run()
 
 
-def buildFile(excelFile, imagesDir, saveDir, fileName):
-    print ("Building file!")
+def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
 
     # setup pygame as drawing library
     import pygame
@@ -34,19 +33,37 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
     with open('template.json', 'r') as infile:
         data = json.load(infile)
         data['SaveName'] = fileName
+
     # open excel file
+    progressCallback("Reading excel file: " + excelFile)
     workbook = xlrd.open_workbook(excelFile)
 
     # collect entity libraries
+    progressCallback("Reading tokens... ", False)
     tokens = TokenParser.parse(workbook.sheet_by_name('Tokens'))
-    dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
+    progressCallback(str(len(tokens)) + " token succesfully extracted.")
 
+    progressCallback("Reading dice... ", False)
+    dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
+    progressCallback(str(len(dice)) + " dice succesfully extracted.")
+
+    progressCallback("Reading complex types... ", False)
     complexTypes = ComplexTypeParser.parse(workbook.sheet_by_name('ComplexTypes'), workbook.sheet_by_name('Shapes'))
+    progressCallback(str(len(complexTypes)) + " types succesfully extracted.")
+
+    progressCallback("Reading complex objects... ", False)
     complexParser = ComplexObjectParser(complexTypes)
     complexObjects = complexParser.parse(workbook.sheet_by_name('ComplexObjects'))
+    progressCallback(str(len(complexObjects)) + " complex objects succesfully extracted.")
+
+    progressCallback("Reading decks... ", False)
     decks = DeckParser.parse(workbook.sheet_by_name('Decks'), complexObjects)
+    progressCallback(str(len(decks)) + " decks succesfully extracted.")
+
+    progressCallback("Drawing all custom content.")
 
     # draw all the card decks
+    progressCallback("Drawing decks... ", False)
     drawer = DeckDrawer()
     for deck in decks:
         path = imagesDir + '/' + deck.name + ".jpg"
@@ -59,43 +76,58 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
         path = imagesDir + '/' + deck.name + "_back.jpg"
         pygame.image.save(drawer.draw(deck), path)
         deck.setBackImagePath(path)
+    progressCallback(str(len(decks)) + " decks succesfully drawn.")
 
     # draw all the boards
+    progressCallback("Drawing boards... ", False)
+    done = 0
     for obj in complexObjects:
         if obj.type.type == 'board':
             path = imagesDir + '/' + obj.name + ".jpg"
             drawer = ComplexObjectDrawer(obj)
             pygame.image.save(drawer.draw(), path )
             obj.setImagePath(path)
+            done+=1
+    progressCallback(str(done) + " boards succesfully drawn.")
 
     # draw all the (custom) tokens
+    progressCallback("Drawing tokens... ", False)
+    done = 0
     for token in tokens:
         if isinstance(token, ContentToken):
             path = imagesDir + '/token_' + token.name + ".jpg"
             drawer = TokenDrawer(token)
             pygame.image.save(drawer.draw(), path)
             token.setImagePath(path)
+            done += 1
+    progressCallback(str(done) + " custom tokens succesfully drawn.")
 
     # draw all dice
+    progressCallback("Drawing dice... ", False)
+    done = 0
     for die in dice:
         if die.customContent:
             path = imagesDir + '/die_' + die.name + ".png"
             drawer = DiceDrawer(die)
             pygame.image.save(drawer.draw(), path)
             die.setImagePath(path)
+            done += 1
+    progressCallback(str(done) + " dice succesfully drawn.")
 
+    progressCallback("Placing all entities on the tabletop.")
     # build all required entities
     creator = EntityCreator(tokens + dice + complexObjects + decks)
     entities = creator.createEntities(workbook.sheet_by_name('Placement'))
+    progressCallback("All entities have been placed.")
 
     # add entities to save file
     data["ObjectStates"] = entities
 
     # save file
-    with open(saveDir + '/TS_' + fileName.replace(' ', '_') + '.json', 'w') as outfile:
+    path = saveDir + '/TS_' + fileName.replace(' ', '_') + '.json'
+    progressCallback("Saving file to " + path)
+    with open(path, 'w') as outfile:
         json.dump(data, outfile)
-
-    print("Done building file!")
 
 from tkinter import *
 from tkinter import filedialog
@@ -153,7 +185,8 @@ class Config:
 
 class App:
     def __init__(self, master):
-        master.geometry("700x200")
+        self.master = master
+        master.geometry("700x600")
         self.filenameVar = StringVar()
         self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar)
 
@@ -179,6 +212,12 @@ class App:
         self.button = Button(buttonFrame, text="QUIT", command=frame.quit)
         self.button.grid(row=0, column=1)
 
+        self.statusLabel = Label(frame, text="Status:")
+        self.statusLabel.grid(row=6, column=0, columnspan=2)
+
+        self.status = Text(frame)
+        self.status.grid(row=7, column=0, columnspan=2)
+        self.status.tag_configure("error", foreground="red", underline=True)
 
     def excelFile(self, frame):
         self.excelButton = Button(frame, text="SET EXCEL FILE", command=self.config.setExcelFile, width=30)
@@ -210,8 +249,29 @@ class App:
 
     def build(self):
         if self.config.readyToRun():
-            buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(), self.config.fileName.get())
+            self.flushStatus()
+            self.pushStatusMessage("Going to build!")
+            try:
+                buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(), self.config.fileName.get(), self.pushStatusMessage)
+                self.pushStatusMessage("Done building!")
+            except BaseException as e:
+                self.pushErrorMessage(e)
+                raise e
 
+    def pushErrorMessage(self, e):
+        self.pushStatusMessage("\n")
+        index = self.status.index(INSERT)
+        curline = index.split('.')[0]
+        self.pushStatusMessage("\nUh oh, there was a problem while building:")
+        self.status.tag_add("error", str(int(curline) + 1) + ".0", str(int(curline) + 2) + ".0")
+        self.pushStatusMessage(str(e))
+
+    def pushStatusMessage(self, msg, newline=True):
+        self.status.insert(END, msg + ("\n" if newline else ''))
+        self.master.update()
+
+    def flushStatus(self):
+        self.status.delete(1.0, END)
 
 root = Tk()
 app = App(root)
