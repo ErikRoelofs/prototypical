@@ -1,3 +1,5 @@
+from tts.guid import guid
+
 class Deck():
     def __init__(self, transform, name, cards, imagePath, backImagePath):
         self.transform = transform
@@ -45,7 +47,7 @@ class Deck():
             'LuaScript': '',
             'LuaScriptState': '',
             'ContainedObjects': [],
-            'GUID': '0b80cc'
+            "GUID": guid()
         }
 
     def as_dict(self):
@@ -82,5 +84,5 @@ class Deck():
                 'LuaScript': '',
                 'LuaScriptState': '',
                 'ContainedObjects': self.get_cards(),
-                'GUID': 'a3cad1'
+            "GUID": guid()
         }

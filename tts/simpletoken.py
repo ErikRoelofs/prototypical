@@ -1,3 +1,5 @@
+from tts.guid import guid
+
 class SimpleToken():
 
     def __init__(self, typename, transform, color):
@@ -36,5 +38,5 @@ class SimpleToken():
             'Hands': False,
             'LuaScript': '',
             'LuaScriptState': '',
-            'GUID': '8297db'
+            "GUID": guid()
         }

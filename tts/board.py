@@ -1,3 +1,5 @@
+from tts.guid import guid
+
 class Board():
     def __init__(self, transform, object):
         self.transform = transform
@@ -29,5 +31,5 @@ class Board():
             },
             "LuaScript": "",
             "LuaScriptState": "",
-            "GUID": "6c9a70"
+            "GUID": guid()
         }

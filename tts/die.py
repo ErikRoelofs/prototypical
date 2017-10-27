@@ -1,3 +1,5 @@
+from tts.guid import guid
+
 class Die():
     def __init__(self, sides, color, transform, customContent = None, imagePath = None):
         self.sides = sides
@@ -28,7 +30,7 @@ class Die():
             "MaterialIndex": 0,
             "LuaScript": "",
             "LuaScriptState": "",
-            "GUID": "589901",
+            "GUID": guid(),
             "RotationValues": self.getRotValues()
         }
         if self.customContent:

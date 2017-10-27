@@ -1,3 +1,5 @@
+from tts.guid import guid
+
 class Token():
 
     def __init__(self, transform, image ):
@@ -35,5 +37,5 @@ class Token():
             },
             'LuaScript': '',
             'LuaScriptState': '',
-            'GUID': '8297db'
+            "GUID": guid()
         }
