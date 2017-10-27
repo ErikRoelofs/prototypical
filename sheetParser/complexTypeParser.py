@@ -95,9 +95,11 @@ class ComplexTypeParser:
             newAreas[ComplexTypeParser.reduceChar(char)] = area
         return newAreas
 
-    def reduceChar(char):
-        # because 'c' is 0, a and b are reserved
-        if len(char) == 1:
-            return ord(char) - 99
-        else:
-            return ord(char[1]) + 26
+    def reduceChar(chars):
+        value = 0
+        for char in chars:
+            value *= 26
+            value += ord(char.lower()) - 96
+
+        # because 'c' is 0, a and b are reserved, and areas start from 0, but a=1
+        return value - 3

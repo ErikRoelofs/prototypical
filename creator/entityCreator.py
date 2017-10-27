@@ -92,6 +92,9 @@ class EntityCreator:
             yChunk = sheet.cell(rowx=row, colx=1).value
             col = 2
             while col < sheet.ncols and col < 10:
+                if sheet.cell(rowx=row, colx=col).value == '':
+                    col += 2;
+                    continue
                 try:
                     numToPlace = read_number(sheet.cell(rowx=row, colx=col).value)
                 except ValueError as e:
