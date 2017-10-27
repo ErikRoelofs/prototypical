@@ -35,7 +35,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
         data['SaveName'] = fileName
 
     # open excel file
-    progressCallback("Reading excel file: " + excelFile)
+    progressCallback("Reading spreadsheet: " + excelFile)
     workbook = xlrd.open_workbook(excelFile)
 
     # collect entity libraries
@@ -220,7 +220,7 @@ class App:
         self.status.tag_configure("error", foreground="red", underline=True)
 
     def excelFile(self, frame):
-        self.excelButton = Button(frame, text="SET EXCEL FILE", command=self.config.setExcelFile, width=30)
+        self.excelButton = Button(frame, text="SET SPREADSHEET", command=self.config.setExcelFile, width=30)
         self.excelButton.grid(row=1, column=0)
 
         self.excelText = Label(frame, textvariable=self.config.excelFile)
@@ -234,14 +234,14 @@ class App:
         self.savedirText.grid(row=2, column=1)
 
     def imagedirFile(self, frame):
-        self.imagedirButton = Button(frame, text="SET IMAGEDIR FILE", command=self.config.setImagesDir, width=30)
+        self.imagedirButton = Button(frame, text="SET IMAGES DIR", command=self.config.setImagesDir, width=30)
         self.imagedirButton.grid(row=3, column=0)
 
         self.imagedirText = Label(frame, textvariable=self.config.imagesDir)
         self.imagedirText.grid(row=3, column=1)
 
     def filename(self, frame):
-        self.filenameButton = Button(frame, text="SET FILENAME", command=self.config.setFilename, width=30)
+        self.filenameButton = Button(frame, text="SET GAME NAME", command=self.config.setFilename, width=30)
         self.filenameButton.grid(row=4, column=0)
 
         self.filenameText = Label(frame, textvariable=self.config.fileName)

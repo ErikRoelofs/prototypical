@@ -25,7 +25,7 @@ class DiceDrawer:
         self.smallFontObj = pygame.font.Font('freesansbold.ttf', 96)
 
     def draw(self):
-        surf = pygame.image.load('D6.png')
+        surf = pygame.image.load('data/D6.png')
         for pos, spot in enumerate(DRAWSPOTS):
             content = self.die.customContent[pos]
             if isinstance(content, float) and content.is_integer():
