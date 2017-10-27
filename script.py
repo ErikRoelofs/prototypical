@@ -86,6 +86,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName):
     with open(saveDir + '/TS_' + fileName.replace(' ', '_') + '.json', 'w') as outfile:
         json.dump(data, outfile)
 
+    print("Done building file!")
 
 from tkinter import *
 from tkinter import filedialog

@@ -1,12 +1,13 @@
 class Die():
-    def __init__(self, sides, color, transform):
+    def __init__(self, sides, color, transform, customContent = None):
         self.sides = sides
         self.color = color
         self.transform = transform
+        self.customContent = customContent
 
     def as_dict(self):
-        return {
-            "name": "Die_" + str(int(self.sides)),
+        base = {
+            "name": self.name(),
             'Transform': self.transform.as_dict(),
             'Nickname': '',
             'Description': '',
@@ -29,8 +30,29 @@ class Die():
             "GUID": "589901",
             "RotationValues": self.getRotValues()
         }
+        if self.customContent:
+            base['CustomImage'] = self.customDice()
+
+        return base
+
+    def name(self):
+        if self.customContent:
+            return "Custom_Dice"
+        return "Die_" + str(int(self.sides))
+
+    def customDice(self):
+        return {
+            "ImageURL": "file:///C:/Users/Pluisjen/Pictures/prototypical/D6.png",
+            "ImageSecondaryURL": "",
+            "WidthScale": 0.0,
+            "CustomDice": {
+                "Type": 1
+            }
+        }
 
     def getRotValues(self):
+        if self.customContent:
+            return self.getRotValuesCustom()
         if self.sides == 4:
             return self.getRotValues4()
         if self.sides == 6:
@@ -41,6 +63,59 @@ class Die():
             return self.getRotValues12()
         if self.sides == 20:
             return self.getRotValues20()
+
+    def getRotValuesCustom(self):
+        return [
+        {
+          "Value": self.customContent[0],
+          "Rotation": {
+            "x": -90.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        {
+          "Value": self.customContent[1],
+          "Rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        {
+          "Value": self.customContent[2],
+          "Rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -90.0
+          }
+        },
+        {
+          "Value": self.customContent[3],
+          "Rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 90.0
+          }
+        },
+        {
+          "Value": self.customContent[4],
+          "Rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -180.0
+          }
+        },
+        {
+          "Value": self.customContent[5],
+          "Rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      ]
+
 
     def getRotValues4(self):
         return [
