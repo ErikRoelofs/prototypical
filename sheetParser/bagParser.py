@@ -1,6 +1,8 @@
 from domain.bag import Bag, InfiniteBag
 
 from reader.fromlist import read_fromlist
+from reader.color import ColorReader
+from reader.number import read_float
 
 class BagParser:
     def __init__(self, types):
@@ -12,7 +14,10 @@ class BagParser:
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
             type = read_fromlist(sheet.cell(rowx=row, colx=1).value, ('bag', 'infinite-bag'))
-            bag = Bag(name) if type == 'bag' else InfiniteBag(name)
+            color = ColorReader.read_color(sheet.cell(rowx=row, colx=2).value)
+            size = read_float(sheet.cell(rowx=row, colx=3).value)
+
+            bag = Bag(name, size, color) if type == 'bag' else InfiniteBag(name, size, color)
             contentNum = 0
             while contentNum < (sheet.ncols - 4):
                 contentValue = sheet.cell(rowx=row, colx=contentNum+4).value

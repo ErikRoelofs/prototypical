@@ -4,12 +4,14 @@ from domain.token import ContentToken
 from domain.die import Die
 from domain.deck import Deck
 from domain.complexObject import ComplexObject
+from domain.bag import Bag, InfiniteBag
 from tts.simpletoken import SimpleToken
 from tts.transform import Transform
 from tts.die import Die as TTSDie
 from tts.deck import Deck as TTSDeck
 from tts.board import Board as TTSBoard
 from tts.token import Token as TTSToken
+from tts.bag import Bag as TTSBag
 
 XMIN = -27
 XMAX = 27
@@ -55,6 +57,8 @@ class EntityCreator:
                 return self.placeBoard(coords, entity)
             else:
                 raise ValueError("Only ComplexTypes of the 'board' type can be placed directly. The others go into a deck! (Tried placing a " + entity.name + ")")
+        if isinstance(entity, Bag):
+            return self.placeBag(coords, entity)
         raise NotImplementedError("Not sure what to do with this: " + entity.__class__.__name__)
 
     def placeToken(self, coords, entity):
@@ -81,6 +85,17 @@ class EntityCreator:
         transform = Transform(coords[0], BOARDYHEIGHT, coords[1], 0, 0, 0, 1, 1, 1)
         board = TTSBoard(transform, entity)
         return board.as_dict()
+
+    def placeBag(self, coords, entity):
+        transform = Transform(coords[0], BOARDYHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
+        bag = TTSBag(transform, entity.color, entity.name, self.convertToTTS(coords, entity.content), isinstance(entity, InfiniteBag))
+        return bag.as_dict()
+
+    def convertToTTS(self, coords, items):
+        converted = []
+        for item in items:
+            converted.append(self.createEntity(coords, item))
+        return converted
 
     def parseContent(self, content):
         if content == '':
