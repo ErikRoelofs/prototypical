@@ -197,20 +197,18 @@ You can leave columns empty to leave blanks on the die, except the first one (wh
 
 ## Placement
 
-This final tab decides what goes where. The first row is used to decide in how many pieces to divide the table.
+This final tab decides what goes where. It shows a large square, 15 by 15 cells wide (with a border to show the size of the board)
 
-Row one, column one always contains the word "Chunks". The two columns after are the number of horizontal and the number of vertical chunks.
+Each cell represents a 1/15th by 1/15th chunk of the final playing table. To put things on the table, simply write the name(s) of the items where you want them put.
 
-Each row after that contains content that goes somewhere on the board.
+If you want to place multiple different items, seperate them with a semicolon: 'Card;Pawn'
 
-Every row starts off with the first two columns containing the X-chunk and the Y-chunk (from 1 to maximum chunks minus 1)
+If you want to place multiple of the same item, prepend the name of the item with a number and an x: '15xPawn'
 
-After that, every two columns reference first a number of entities to place, and then the name of the entity to place.
+(You can add spaces if you like)
 
-The name must be from any "Name" colum from another tab. (With the exception of a Complex-Object of the "card" type, which cannot be placed directly.)
+Note that items are placed with their *center* somewhere in the shown area. Really large items will spill over into adjacent areas.
 
-For an example, look at this row:
+Also, Prototypical doesn't know how big things are, so it randomly distributes them around the cell.
 
-0   1   3 Die_6 2 Die_8
-
-This would place 3 entities of type "Die_6" and 2 entities of type "Die_8" in chunk (0,1) on the table.
+Usually this isn't a problem, but occasionally two items will intersect and bounce off the table when you load the game. In this case, rebuilding is usually enough to fix it. If it's a common occurence, pack the cells less densely.
