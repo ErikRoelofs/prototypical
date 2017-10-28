@@ -11,8 +11,6 @@ from tts.deck import Deck as TTSDeck
 from tts.board import Board as TTSBoard
 from tts.token import Token as TTSToken
 
-from reader.number import read_number
-
 XMIN = -27
 XMAX = 27
 ZMIN = -17
@@ -20,6 +18,8 @@ ZMAX = 17
 YHEIGHT = 2
 BOARDYHEIGHT = 1
 
+XCHUNKS = 15
+YCHUNKS = 15
 
 class EntityCreator:
     def __init__(self, library):
@@ -82,31 +82,28 @@ class EntityCreator:
         board = TTSBoard(transform, entity)
         return board.as_dict()
 
+    def parseContent(self, content):
+        if content == '':
+            return ()
+        parts = content.split(';')
+        contentItems = []
+        for part in parts:
+            if part == '':
+                continue
+            amount, entity = part.split('x', 1)
+            contentItems.append((amount, entity))
+        return contentItems
+
     def createEntities(self, sheet):
-        chunksWide = sheet.cell(rowx=0, colx=1).value
-        chunksHigh = sheet.cell(rowx=0, colx=2).value
         entities = []
-        row = 1
-        while row < sheet.nrows:
-            xChunk = sheet.cell(rowx=row, colx=0).value
-            yChunk = sheet.cell(rowx=row, colx=1).value
-            col = 2
-            while col < sheet.ncols:
-                if sheet.cell(rowx=row, colx=col).value == '':
-                    col += 2;
-                    continue
-                try:
-                    numToPlace = read_number(sheet.cell(rowx=row, colx=col).value)
-                except ValueError as e:
-                    raise ValueError(str(e) + " (while trying to place items on the board)")
-                if numToPlace:
-                    typeToPlace = sheet.cell(rowx=row, colx=col + 1).value
+        for col in range(0,min(14, sheet.ncols)):
+            for row in range(0,min(14, sheet.nrows)):
+                content = self.parseContent(sheet.cell(rowx=row, colx=col).value)
+                for item in content:
                     try:
-                        object = self.findObjectByName(typeToPlace)
+                        object = self.findObjectByName(item[1])
                     except ValueError as e:
                         raise ValueError(str(e) + " (while trying to place items on the board)")
-                    for i in range(0, int(numToPlace)):
-                        entities.append(self.createEntity(self.getCoordInChunk(xChunk, yChunk, chunksWide, chunksHigh), object))
-                col += 2
-            row += 1
+                    for i in range(0, int(item[0])):
+                        entities.append(self.createEntity(self.getCoordInChunk(row, col, XCHUNKS, YCHUNKS), object))
         return entities
