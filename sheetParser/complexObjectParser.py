@@ -11,10 +11,10 @@ class ComplexObjectParser:
             name = sheet.cell(rowx=row, colx=0).value
             type = self.findType(sheet.cell(rowx=row, colx=1).value)
             content = []
-            col = 2
-            while col < sheet.ncols:
-                content.append(sheet.cell(rowx=row, colx=col).value)
-                col += 1
+            contentNum = 0
+            while contentNum < min(sheet.ncols, len(type.shape.areas)):
+                content.append(sheet.cell(rowx=row, colx=contentNum+2).value)
+                contentNum += 1
 
             complexObjects.append(ComplexObject(name, type, content))
             row += 1
@@ -24,4 +24,4 @@ class ComplexObjectParser:
         for type in self.types:
             if type.name == name:
                 return type
-        raise ValueError("The ComplexType `" + name + "` does not exist.") from None
+        raise ValueError("The ComplexType `" + str(name) + "` does not exist.") from None
