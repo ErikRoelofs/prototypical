@@ -12,7 +12,7 @@ class ComplexObjectParser:
             type = self.findType(sheet.cell(rowx=row, colx=1).value)
             content = []
             contentNum = 0
-            while contentNum < min(sheet.ncols, len(type.shape.areas)):
+            while contentNum < min(sheet.ncols - 2, len(type.shape.areas)):
                 content.append(sheet.cell(rowx=row, colx=contentNum+2).value)
                 contentNum += 1
 

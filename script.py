@@ -1,22 +1,21 @@
-import json, xlrd
-
-from sheetParser.tokenParser import TokenParser
-from sheetParser.diceParser import DiceParser
-from sheetParser.complexTypeParser import ComplexTypeParser
-from sheetParser.complexObjectParser import ComplexObjectParser
-from sheetParser.deckParser import DeckParser
-
-from drawer.deckDrawer import DeckDrawer
-from drawer.complexObjectDrawer import ComplexObjectDrawer
-from drawer.cardBackDrawer import CardBackDrawer
-from drawer.tokenDrawer import TokenDrawer
-from drawer.diceDrawer import DiceDrawer
+import json
+import xlrd
 
 from creator.entityCreator import EntityCreator
-
+from domain.token import ContentToken
+from drawer.cardBackDrawer import CardBackDrawer
+from drawer.complexObjectDrawer import ComplexObjectDrawer
+from drawer.deckDrawer import DeckDrawer
+from drawer.diceDrawer import DiceDrawer
+from drawer.tokenDrawer import TokenDrawer
+from sheetParser.complexObjectParser import ComplexObjectParser
+from sheetParser.complexTypeParser import ComplexTypeParser
+from sheetParser.deckParser import DeckParser
+from sheetParser.diceParser import DiceParser
+from sheetParser.bagParser import BagParser
+from sheetParser.tokenParser import TokenParser
 from tests.complexTypeParserTest import ComplexTypeParserTest
 
-from domain.token import ContentToken
 
 def runTests():
     # run test cases
@@ -59,6 +58,12 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     progressCallback("Reading decks... ", False)
     decks = DeckParser.parse(workbook.sheet_by_name('Decks'), complexObjects)
     progressCallback(str(len(decks)) + " decks succesfully extracted.")
+
+    progressCallback("Reading bags... ", False)
+    bagParser = BagParser(tokens + dice + complexObjects + decks)
+    bags = bagParser.parse(workbook.sheet_by_name('Containers'))
+    progressCallback(str(len(decks)) + " decks succesfully extracted.")
+
 
     progressCallback("Drawing all custom content.")
 
@@ -116,7 +121,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
 
     progressCallback("Placing all entities on the tabletop.")
     # build all required entities
-    creator = EntityCreator(tokens + dice + complexObjects + decks)
+    creator = EntityCreator(tokens + dice + complexObjects + decks + bags)
     entities = creator.createEntities(workbook.sheet_by_name('Placement'))
     progressCallback("All entities have been placed.")
 
