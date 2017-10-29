@@ -224,6 +224,9 @@ class App:
         self.status.grid(row=7, column=0, columnspan=2)
         self.status.tag_configure("error", foreground="red", underline=True)
 
+        self.statusLabel = Label(frame, text="version: Early Alpha v0.2.0")
+        self.statusLabel.grid(row=8, column=0, columnspan=2)
+
     def excelFile(self, frame):
         self.excelButton = Button(frame, text="SET SPREADSHEET", command=self.config.setExcelFile, width=30)
         self.excelButton.grid(row=1, column=0)
@@ -258,10 +261,13 @@ class App:
             import os, sys
             from shutil import copyfile
             path = file + ".xls"
-            copyfile("data/template.xls", path)
-            self.pushStatusMessage("Created a new empty template: " + path)
-            if sys.platform == 'win32':
-                os.startfile(path)
+            try:
+                copyfile("data/template.xls", path)
+                self.pushStatusMessage("Created a new empty template: " + path)
+                if sys.platform == 'win32':
+                    os.startfile(path)
+            except FileNotFoundError as e:
+                self.pushErrorMessage("The base template is missing. Please ensure that the application was installed successfully.", "creating template")
 
     def build(self):
         if self.config.readyToRun():
@@ -274,12 +280,12 @@ class App:
                 self.pushErrorMessage(e)
                 raise e
 
-    def pushErrorMessage(self, e):
+    def pushErrorMessage(self, e, during="building"):
         import traceback
         self.pushStatusMessage("\n")
         index = self.status.index(INSERT)
         curline = index.split('.')[0]
-        self.pushStatusMessage("\nUh oh, there was a problem while building:")
+        self.pushStatusMessage("\nUh oh, there was a problem while " + during + ":")
         self.status.tag_add("error", str(int(curline) + 1) + ".0", str(int(curline) + 2) + ".0")
         self.pushStatusMessage(str(e))
         self.pushStatusMessage("\n" + traceback.format_exc())

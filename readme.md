@@ -1,4 +1,4 @@
-# Prototypical v0.1
+# Prototypical v0.1-alpha
 
 ## What does it do?
 
