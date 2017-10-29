@@ -8,7 +8,7 @@ class TokenDrawer:
 
     def __init__(self, token):
         self.token = token
-        self.fontObj = pygame.font.Font('freesansbold.ttf', 32)
+        self.fontObj = pygame.font.Font('data/proto.ttf', 32)
 
     def draw(self):
         content = self.token.content

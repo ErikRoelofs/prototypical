@@ -21,8 +21,8 @@ DRAWSPOTS = [
 class DiceDrawer:
     def __init__(self, die):
         self.die = die
-        self.largeFontObj = pygame.font.Font('freesansbold.ttf', 256)
-        self.smallFontObj = pygame.font.Font('freesansbold.ttf', 96)
+        self.largeFontObj = pygame.font.Font('data/proto.ttf', 256)
+        self.smallFontObj = pygame.font.Font('data/proto.ttf', 96)
 
     def draw(self):
         surf = pygame.image.load('data/D6.png')

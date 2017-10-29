@@ -13,7 +13,7 @@ class ComplexObjectDrawer:
     def __init__(self, object):
         self.object = object
         self.size = self.getShapeSize(object.type.shape)
-        self.fontObj = pygame.font.Font('freesansbold.ttf', 32)
+        self.fontObj = pygame.font.Font('data/proto.ttf', 32)
 
     def draw(self):
         w, h = self.getCardSize()
