@@ -10,3 +10,5 @@ dist/
 prototypical.spec
 build/
 *.html
+!data/template.xls
+*.zip
