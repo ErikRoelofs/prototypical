@@ -224,7 +224,12 @@ class App:
         self.status.grid(row=7, column=0, columnspan=2)
         self.status.tag_configure("error", foreground="red", underline=True)
 
-        self.statusLabel = Label(frame, text="version: Early Alpha v0.2.0")
+        try:
+            version = open('data/version', 'r').readline(10)
+        except FileNotFoundError as e:
+            version = 'dev'
+
+        self.statusLabel = Label(frame, text="version: " + version)
         self.statusLabel.grid(row=8, column=0, columnspan=2)
 
     def excelFile(self, frame):

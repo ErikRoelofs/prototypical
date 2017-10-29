@@ -3,3 +3,4 @@ cp *.md dist/
 cp data -r dist/data
 cp LICENSE dist/
 cp demogame.xls dist/
+git describe --tags $(git rev-list --tags --max-count=1) >> dist/data/version
