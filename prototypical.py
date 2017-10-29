@@ -279,6 +279,8 @@ class App:
             except BaseException as e:
                 self.pushErrorMessage(e)
                 raise e
+        else:
+            self.pushErrorMessage("Missing some settings. Please ensure all 4 settings above are configured properly.")
 
     def pushErrorMessage(self, e, during="building"):
         import traceback

@@ -7,5 +7,5 @@ TS_Save_3.json
 settings.json
 *.pyc
 dist/
-script.spec
+prototypical.spec
 build/
