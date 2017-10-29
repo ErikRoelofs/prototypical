@@ -9,3 +9,4 @@ settings.json
 dist/
 prototypical.spec
 build/
+*.html

@@ -113,6 +113,37 @@ Below that, the first column of each row should reference the *name* of a Comple
 
 You can keep repeating card names and counts and everything will go in the same deck, until the first column contains the word 'Deck' again, which signals a new deck.
 
+## Containers
+
+Containers produce bags in Tabletop Simulator that contain various other content from your game.
+
+### NAME
+The name of this bag type.  You can use whatever you want, and reference the object in other sheets by this name.
+
+*Names should be unique across all sheets.*
+
+### TYPE
+Either 'bag' or 'infinite-bag', to build either of those types of bags.
+
+### COLOR
+This references a color, which will determine the color of the bag.
+
+It is either a written name of a color, or a color hex-code: 'red' or '#ff0000'*.
+
+To see (or modify) the list of supported colors, look at "colors.xls" in the data folder.
+
+(Note that if you modify it and then send your game-sheet to someone else, they will not be able to build it!)
+
+### SIZE
+
+How large the bag should be. Using 1 will produce a normal sized bag. The number can be floating point.
+
+### CONTENTS
+
+Each column starting with this one contains the name of an object that is in the bag. If you want multiple of the same item, put the name in multiple times. (Scheduled to be improved)
+
+If you picked an Infinite Bag, only put one thing here, as an Infinite Bag can only contain one thing.
+
 ## Tokens
 
 Tokens represent the various, simpler, parts of your game. This may include colored cubes, pawns, triangles, but also custom tokens with text or numbers on them.
