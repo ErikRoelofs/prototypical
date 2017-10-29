@@ -30,7 +30,7 @@ You will need to obtain a copy of Tabletop Simulator from [Berserk Games](http:/
 
 After launching the program, you will see the interface:
 
-![Interface.png](interface.png)
+![Interface.png](data/interface.png)
 
 You can click "NEW TEMPLATE" to generate a new template. Place it anywhere you like, then click "SET SPREADSHEET" to select it for building.
 
