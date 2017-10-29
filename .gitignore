@@ -6,3 +6,6 @@ TS_Save_3.json
 *.xls#
 settings.json
 *.pyc
+dist/
+script.spec
+build/
