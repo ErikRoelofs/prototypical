@@ -298,5 +298,6 @@ class App:
         self.status.delete(1.0, END)
 
 root = Tk()
+root.wm_title("Prototypical")
 app = App(root)
 root.mainloop()
