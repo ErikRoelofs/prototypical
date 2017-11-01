@@ -102,4 +102,4 @@ class ComplexTypeParser:
             value += ord(char.lower()) - 96
 
         # because 'c' is 0, a and b are reserved, and areas start from 0, but a=1
-        return value - 3
+        return value - 1

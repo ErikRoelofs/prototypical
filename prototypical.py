@@ -64,7 +64,6 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     bags = bagParser.parse(workbook.sheet_by_name('Containers'))
     progressCallback(str(len(decks)) + " decks succesfully extracted.")
 
-
     progressCallback("Drawing all custom content.")
 
     # draw all the card decks
