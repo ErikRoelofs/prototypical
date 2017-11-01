@@ -1,5 +1,5 @@
 import pygame
-
+from font.font import Font
 # 2,4,5
 # 1,3,6 (1 and 6 are upside down)
 
@@ -21,8 +21,8 @@ DRAWSPOTS = [
 class DiceDrawer:
     def __init__(self, die):
         self.die = die
-        self.largeFontObj = pygame.font.Font('data/proto.ttf', 256)
-        self.smallFontObj = pygame.font.Font('data/proto.ttf', 96)
+        self.largeFontObj = Font.getFont(256)
+        self.smallFontObj = Font.getFont(96)
 
     def draw(self):
         surf = pygame.image.load('data/D6.png')

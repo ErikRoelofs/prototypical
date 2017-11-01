@@ -1,4 +1,7 @@
-# from http://www.pygame.org/pcr/text_rect/index.php
+# from http://www.pygame.org/pcr/text_rect/index.php and then modified by adding render_fitted_textrect
+
+from font.font import Font
+
 
 class TextRectException(BaseException):
     def __init__(self, message=None):
@@ -6,6 +9,18 @@ class TextRectException(BaseException):
 
     def __str__(self):
         return self.message
+
+
+sizes = (512,256,128,96,72,60,48,36,32,24,18,16)
+
+
+def render_fitted_textrect(string, rect, text_color, background_color, justification=0):
+    for size in sizes:
+        font = Font.getFont(size)
+        try:
+            return render_textrect(string, font, rect, text_color, background_color, justification)
+        except TextRectException as e:
+            continue
 
 
 def render_textrect(string, font, rect, text_color, background_color, justification=0):

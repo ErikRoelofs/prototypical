@@ -1,6 +1,7 @@
 import pygame
 
 from drawer.color import convert_tts_to_pygame
+from font.font import Font
 
 MARGIN = 10
 
@@ -8,7 +9,7 @@ class TokenDrawer:
 
     def __init__(self, token):
         self.token = token
-        self.fontObj = pygame.font.Font('data/proto.ttf', 32)
+        self.fontObj = Font.getFont(32)
 
     def draw(self):
         content = self.token.content

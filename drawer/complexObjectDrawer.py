@@ -1,7 +1,8 @@
 import pygame
 
-from drawer.textrect import render_textrect
+from drawer.textrect import render_fitted_textrect
 from drawer.color import convert_tts_to_pygame
+from font.font import Font
 
 EDGE_MARGIN = 25
 
@@ -13,7 +14,6 @@ class ComplexObjectDrawer:
     def __init__(self, object):
         self.object = object
         self.size = self.getShapeSize(object.type.shape)
-        self.fontObj = pygame.font.Font('data/proto.ttf', 32)
 
     def draw(self):
         w, h = self.getCardSize()
@@ -59,6 +59,6 @@ class ComplexObjectDrawer:
 
         # the render function expects a rect with 0,0 topleft.
         rerect = pygame.Rect((0,0, rect[2] - rect[0], rect[3] - rect[1]))
-        surf = render_textrect(str(content), self.fontObj, rerect, (0,0,0), (255,255,255))
+        surf = render_fitted_textrect(str(content), rerect, (0, 0, 0), (255, 255, 255))
 
         self.surf.blit(surf, rect)
