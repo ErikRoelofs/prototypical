@@ -2,7 +2,6 @@ import pygame
 
 from drawer.textrect import render_fitted_textrect
 from drawer.color import convert_tts_to_pygame
-from font.font import Font
 
 EDGE_MARGIN = 25
 
@@ -19,9 +18,8 @@ class ComplexObjectDrawer:
         w, h = self.getCardSize()
         self.surf = pygame.Surface((w - 2 * EDGE_MARGIN,h - 2 * EDGE_MARGIN))
         self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
-        for key, content in enumerate(self.object.content):
-            if key in self.object.type.shape.areas:
-                self.drawContentToArea(content, self.object.type.shape.areas[key])
+        for key, content in self.object.content.items():
+            self.drawContentToArea(content, self.object.type.shape.areas[key])
         self.fullSurf = pygame.Surface((w, h))
         self.fullSurf.fill(convert_tts_to_pygame(self.object.type.bgColor))
         self.fullSurf.blit(self.surf, (EDGE_MARGIN, EDGE_MARGIN))
@@ -31,14 +29,7 @@ class ComplexObjectDrawer:
         return self.object.type.size
 
     def getShapeSize(self, shape):
-        height = 0
-        width = 0
-        for number, area in shape.areas.items():
-            if area[3] > width:
-                width = area[3]
-            if area[2] > height:
-                height = area[2]
-        return (width + 1, height + 1)
+        return shape.size
 
     # note: areas in the shape are actually row, col and not x,y
     def drawContentToArea(self, content, area):

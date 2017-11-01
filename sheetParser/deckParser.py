@@ -33,4 +33,4 @@ class DeckParser:
         for obj in objects:
             if obj.name == name:
                 return obj
-        raise ValueError("Unknown card by name: " + name)
+        raise ValueError("Unknown card by name: " + str(name))

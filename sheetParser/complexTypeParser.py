@@ -6,6 +6,7 @@ from reader.dimensions import read_dimensions
 from reader.fromlist import read_fromlist
 
 class ComplexTypeParser:
+    @staticmethod
     def parse(sheet, shapeSheet):
         complexTypes = []
         row = 1
@@ -38,6 +39,7 @@ class ComplexTypeParser:
             row += 1
         return complexTypes
 
+    @staticmethod
     def parseShape(shapeSheet, topLeft, bottomRight):
         firstRow = topLeft[1]
         firstCol = topLeft[0]
@@ -51,10 +53,12 @@ class ComplexTypeParser:
                 cols.append(shapeSheet.cell(rowx = row, colx = col).value)
             rows.append(cols)
 
-        return ComplexTypeParser.constructShape(rows)
+        size = (lastCol - firstCol + 1, lastRow - firstRow + 1)
+        return ComplexTypeParser.constructShape(size, rows)
 
     # construct a shape from the given rows of chars
-    def constructShape(rows):
+    @staticmethod
+    def constructShape(size, rows):
         areas = {}
         for rowNum, row in enumerate(rows):
             for colNum, char in enumerate(row):
@@ -65,8 +69,9 @@ class ComplexTypeParser:
                     areas[char] = ComplexTypeParser.updateArea(areas[char], rowNum, colNum)
                 else:
                     areas[char] = (rowNum, colNum, rowNum, colNum)
-        return Shape(ComplexTypeParser.reduceNames(areas))
+        return Shape(size, ComplexTypeParser.reduceNames(areas))
 
+    @staticmethod
     def validateAllowed(char, rowNum, colNum, areas):
         if char in areas:
             if areas[char][1] > colNum:
@@ -82,6 +87,7 @@ class ComplexTypeParser:
         return True
 
     # will expand the size of this area to include the new cell (if required)
+    @staticmethod
     def updateArea(current, rowNum, colNum):
         if rowNum > current[2]:
             current = (current[0], current[1], rowNum, current[3])
@@ -89,12 +95,14 @@ class ComplexTypeParser:
             current = (current[0], current[1], current[2], colNum)
         return current
 
+    @staticmethod
     def reduceNames(areas):
         newAreas = {}
         for char, area in areas.items():
             newAreas[ComplexTypeParser.reduceChar(char)] = area
         return newAreas
 
+    @staticmethod
     def reduceChar(chars):
         value = 0
         for char in chars:
