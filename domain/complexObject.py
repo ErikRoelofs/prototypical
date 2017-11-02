@@ -11,3 +11,6 @@ class ComplexObject:
 
     def bgcolor(self):
         return self.type.decide_bg_color(self)
+
+    def backcolor(self):
+        return self.type.decide_back_color(self)

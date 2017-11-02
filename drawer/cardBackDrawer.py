@@ -11,4 +11,4 @@ class CardBackDrawer:
         return surf
 
     def drawCardBacks(self, surf, cards):
-        surf.fill(convert_tts_to_pygame(cards[0].object.type.backside))
+        surf.fill(convert_tts_to_pygame(cards[0].object.backcolor()))
