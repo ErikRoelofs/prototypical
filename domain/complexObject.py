@@ -8,3 +8,6 @@ class ComplexObject:
 
     def setImagePath(self, path):
         self.imagePath = path
+
+    def bgcolor(self):
+        return self.type.bgColor

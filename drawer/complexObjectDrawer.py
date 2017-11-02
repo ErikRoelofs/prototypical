@@ -13,15 +13,16 @@ class ComplexObjectDrawer:
     def __init__(self, object):
         self.object = object
         self.size = self.getShapeSize(object.type.shape)
+        self.surf = None
 
     def draw(self):
         w, h = self.getCardSize()
         self.surf = pygame.Surface((w - 2 * EDGE_MARGIN,h - 2 * EDGE_MARGIN))
-        self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
+        self.surf.fill(convert_tts_to_pygame(self.object.bgcolor()))
         for key, content in self.object.content.items():
             self.drawContentToArea(content, self.object.type.shape.areas[key])
         self.fullSurf = pygame.Surface((w, h))
-        self.fullSurf.fill(convert_tts_to_pygame(self.object.type.bgColor))
+        self.fullSurf.fill(convert_tts_to_pygame(self.object.bgcolor()))
         self.fullSurf.blit(self.surf, (EDGE_MARGIN, EDGE_MARGIN))
         return self.fullSurf
 
