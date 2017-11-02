@@ -10,4 +10,4 @@ class ComplexObject:
         self.imagePath = path
 
     def bgcolor(self):
-        return self.type.bgColor
+        return self.type.decide_bg_color(self)

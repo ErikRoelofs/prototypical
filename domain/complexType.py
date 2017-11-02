@@ -6,3 +6,6 @@ class ComplexType:
         self.bgColor = bgColor
         self.backside = backside
         self.type = type
+
+    def decide_bg_color(self, object):
+        return self.bgColor
