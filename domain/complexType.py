@@ -7,5 +7,11 @@ class ComplexType:
         self.backside = backside
         self.type = type
 
+    def required_content(self):
+        keys = list(self.shape.areas.keys())
+        for extra_key in self.bgColor.get_content_keys():
+            keys.append(extra_key)
+        return keys
+
     def decide_bg_color(self, object):
-        return self.bgColor
+        return self.bgColor.get_color(object)

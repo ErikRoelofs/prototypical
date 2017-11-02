@@ -11,7 +11,7 @@ class ComplexObjectParser:
             name = sheet.cell(rowx=row, colx=0).value
             type = self.findType(sheet.cell(rowx=row, colx=1).value)
             content = {}
-            for column in type.shape.areas:
+            for column in type.required_content():
                 content[ column ] = sheet.cell(rowx=row, colx=column).value
 
             complexObjects.append(ComplexObject(name, type, content))

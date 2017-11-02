@@ -4,6 +4,28 @@ from reader.color import ColorReader
 from reader.cell import read_cell
 from reader.dimensions import read_dimensions
 from reader.fromlist import read_fromlist
+from reader.column import read_column_reference
+
+
+class StaticColor:
+    def __init__(self, color):
+        self.color = color
+
+    def get_color(self, obj):
+        return self.color
+
+    def get_content_keys(self):
+        return ()
+
+class ColorFromContent:
+    def __init__(self, content_key):
+        self.content_key = content_key
+
+    def get_color(self, obj):
+        return ColorReader.read_color(obj.content[self.content_key])
+
+    def get_content_keys(self):
+        return (self.content_key, )
 
 class ComplexTypeParser:
     @staticmethod
@@ -28,7 +50,12 @@ class ComplexTypeParser:
             except ValueError as e:
                 raise ValueError(str(e) + " (while reading shape for " + name + ")") from None
 
-            bgColor = ColorReader.read_color(sheet.cell(rowx=row, colx=4).value)
+            # check if it's a color
+            try:
+                bgColor = StaticColor(ColorReader.read_color(sheet.cell(rowx=row, colx=4).value))
+            except ValueError as e:
+                bgColor = ColorFromContent(read_column_reference(sheet.cell(rowx=row, colx=4).value, ComplexTypeParser.reduceChar))
+
             backside = ColorReader.read_color(sheet.cell(rowx=row, colx=5).value)
             try:
                 type = read_fromlist(sheet.cell(rowx=row, colx=6).value, ("card", "board"))
