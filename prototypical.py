@@ -3,7 +3,6 @@ import xlrd
 
 from creator.entityCreator import EntityCreator
 from domain.token import ContentToken
-from drawer.cardBackDrawer import CardBackDrawer
 from drawer.complexObjectDrawer import ComplexObjectDrawer
 from drawer.deckDrawer import DeckDrawer
 from drawer.diceDrawer import DiceDrawer
@@ -70,17 +69,13 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     progressCallback("Drawing decks... ", False)
     drawer = DeckDrawer()
     for deck in decks:
-        path = imagesDir + '/' + deck.name + ".jpg"
-        pygame.image.save(drawer.draw(deck), path )
-        deck.setImagePath( path )
-
-    # draw all the deck backs
-    drawer = CardBackDrawer()
-    for deck in decks:
-        path = imagesDir + '/' + deck.name + "_back.jpg"
-        pygame.image.save(drawer.draw(deck), path)
-        deck.setBackImagePath(path)
-    progressCallback(str(len(decks)) + " decks succesfully drawn.")
+        front_path = imagesDir + '/' + deck.name + ".jpg"
+        back_path = imagesDir + '/' + deck.name + "_back.jpg"
+        front, back = drawer.draw(deck)
+        pygame.image.save(front, front_path )
+        pygame.image.save(back, back_path )
+        deck.setImagePath( front_path )
+        deck.setBackImagePath( back_path )
 
     # draw all the boards
     progressCallback("Drawing boards... ", False)

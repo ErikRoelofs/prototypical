@@ -1,9 +1,15 @@
 import pygame
 from drawer.complexObjectDrawer import ComplexObjectDrawer
+from drawer.color import convert_tts_to_pygame
 
 class DeckDrawer:
 
     def draw(self, deck):
+        front = self.drawFronts(deck)
+        back = self.drawBacks(deck)
+        return front, back
+
+    def drawFronts(self, deck):
         drawer = ComplexObjectDrawer(deck.cards[0].object)
         w, h = drawer.getCardSize()
         self.size = (w * 10, h * 7)
@@ -22,3 +28,12 @@ class DeckDrawer:
                 done += 1
                 if done == len(cards):
                     return
+
+    def drawBacks(self, deck):
+        drawer = ComplexObjectDrawer(deck.cards[0].object)
+        surf = pygame.Surface(drawer.getCardSize())
+        self.drawCardBacks(surf, deck.cards)
+        return surf
+
+    def drawCardBacks(self, surf, cards):
+        surf.fill(convert_tts_to_pygame(cards[0].object.backcolor()))
