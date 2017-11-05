@@ -1,6 +1,7 @@
 class Deck:
-    def __init__(self, name):
+    def __init__(self, name, uniqueBacks):
         self.name = name
+        self.uniqueBacks = uniqueBacks
         self.cards = []
         self.imagePath = ''
         self.backImagePath = ''

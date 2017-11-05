@@ -56,17 +56,19 @@ class ComplexTypeParser:
             except ValueError as e:
                 bgColor = ColorFromContent(read_column_reference(sheet.cell(rowx=row, colx=4).value, ComplexTypeParser.reduceChar))
 
-            try:
-                backside = StaticColor(ColorReader.read_color(sheet.cell(rowx=row, colx=5).value))
-            except ValueError as e:
-                backside  = ColorFromContent(read_column_reference(sheet.cell(rowx=row, colx=5).value, ComplexTypeParser.reduceChar))
+            backside = sheet.cell(rowx=row, colx=5).value
+            if backside != "NEXT":
+                try:
+                    backside = StaticColor(ColorReader.read_color(sheet.cell(rowx=row, colx=5).value))
+                except ValueError as e:
+                    backside  = ColorFromContent(read_column_reference(sheet.cell(rowx=row, colx=5).value, ComplexTypeParser.reduceChar))
 
             try:
                 type = read_fromlist(sheet.cell(rowx=row, colx=6).value, ("card", "board"))
             except ValueError as e:
                 raise ValueError(str(e) + " (while reading: " + name + ")") from None
 
-            complexTypes.append(ComplexType(name, size, shape, bgColor, backside, type))
+            complexTypes.append(ComplexType(name, size, shape, bgColor, backside, type, backside == "NEXT"))
             row += 1
         return complexTypes
 

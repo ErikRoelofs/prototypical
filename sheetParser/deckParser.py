@@ -12,7 +12,7 @@ class DeckParser:
                 # a new deck begins
                 if current_deck and current_deck.cards:
                     decks.append(current_deck)
-                current_deck = Deck(sheet.cell(rowx=row, colx=1).value)
+                current_deck = Deck(sheet.cell(rowx=row, colx=1).value, False)
             else:
                 # add card to current deck
                 try:
@@ -23,6 +23,7 @@ class DeckParser:
 
                 id = current_deck.nextId()
                 current_deck.addCard(Card(card, amount, id))
+                current_deck.uniqueBacks = current_deck.uniqueBacks or card.type.uniqueBack
             row += 1
 
         if current_deck and current_deck.cards:

@@ -78,7 +78,7 @@ class EntityCreator:
 
     def placeDeck(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 180, 1,1,1)
-        deck = TTSDeck(transform, entity.name, entity.cards, entity.imagePath, entity.backImagePath)
+        deck = TTSDeck(transform, entity.name, entity.cards, entity.imagePath, entity.backImagePath, entity.uniqueBacks)
         return deck.as_dict()
 
     def placeBoard(self, coords, entity):

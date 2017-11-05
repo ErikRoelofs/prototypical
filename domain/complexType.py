@@ -1,11 +1,12 @@
 class ComplexType:
-    def __init__(self, name, size, shape, bgColor, backside, type):
+    def __init__(self, name, size, shape, bgColor, backside, type, uniqueBack):
         self.name = name
         self.size = size
         self.shape = shape
         self.bgColor = bgColor
         self.backside = backside
         self.type = type
+        self.uniqueBack = uniqueBack
 
     def required_content(self):
         keys = list(self.shape.areas.keys())
