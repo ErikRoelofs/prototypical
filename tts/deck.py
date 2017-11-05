@@ -1,13 +1,13 @@
 from tts.guid import guid
 
 class Deck():
-    def __init__(self, transform, name, cards, imagePath, backImagePath):
+    def __init__(self, transform, name, cards, imagePath, backImagePath, uniqueBacks = False):
         self.transform = transform
         self.cards = cards
         self.name = name
         self.imagePath = imagePath
         self.backImagePath = backImagePath
-
+        self.uniqueBacks = uniqueBacks
 
     def get_ids(self):
         ids = []
@@ -78,7 +78,7 @@ class Deck():
                         'NumWidth': 10,
                         'NumHeight': 7,
                         'BackIsHidden': False,
-                        'UniqueBack': False
+                        'UniqueBack': self.uniqueBacks
                     }
                 },
                 'LuaScript': '',
