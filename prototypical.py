@@ -23,7 +23,6 @@ def runTests():
 
 
 def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
-
     # setup pygame as drawing library
     import pygame
     pygame.init()
@@ -40,7 +39,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     # collect entity libraries
     progressCallback("Reading tokens... ", False)
     tokens = TokenParser.parse(workbook.sheet_by_name('Tokens'))
-    progressCallback(str(len(tokens)) + " token succesfully extracted.")
+    progressCallback(str(len(tokens)) + " tokens succesfully extracted.")
 
     progressCallback("Reading dice... ", False)
     dice = DiceParser.parse(workbook.sheet_by_name('Dice'))
@@ -62,7 +61,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     progressCallback("Reading bags... ", False)
     bagParser = BagParser(tokens + dice + complexObjects + decks)
     bags = bagParser.parse(workbook.sheet_by_name('Containers'))
-    progressCallback(str(len(decks)) + " decks succesfully extracted.")
+    progressCallback(str(len(bags)) + " bags succesfully extracted.")
 
     progressCallback("Drawing all custom content.")
 
@@ -71,8 +70,8 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     drawer = DeckDrawer()
     for deck in decks:
         path = imagesDir + '/' + deck.name + ".jpg"
-        pygame.image.save(drawer.draw(deck), path )
-        deck.setImagePath( path )
+        pygame.image.save(drawer.draw(deck), path)
+        deck.setImagePath(path)
 
     # draw all the deck backs
     drawer = CardBackDrawer()
@@ -89,9 +88,9 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
         if obj.type.type == 'board':
             path = imagesDir + '/' + obj.name + ".jpg"
             drawer = ComplexObjectDrawer(obj)
-            pygame.image.save(drawer.draw(), path )
+            pygame.image.save(drawer.draw(), path)
             obj.setImagePath(path)
-            done+=1
+            done += 1
     progressCallback(str(done) + " boards succesfully drawn.")
 
     # draw all the (custom) tokens
@@ -133,10 +132,12 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     with open(path, 'w') as outfile:
         json.dump(data, outfile)
 
+
 from tkinter import *
 from tkinter import filedialog
 from tkinter import simpledialog
 from tkinter import font
+
 
 class Config:
     def __init__(self, excelFile, saveDir, imagesDir, fileName):
@@ -151,11 +152,11 @@ class Config:
         self.saveConfig()
 
     def setSaveDir(self):
-        self.saveDir.set(filedialog.askdirectory (initialdir='~'))
+        self.saveDir.set(filedialog.askdirectory(initialdir='~'))
         self.saveConfig()
 
     def setImagesDir(self):
-        self.imagesDir.set(filedialog.askdirectory (initialdir='~'))
+        self.imagesDir.set(filedialog.askdirectory(initialdir='~'))
         self.saveConfig()
 
     def setFilename(self):
@@ -210,7 +211,7 @@ class App:
         buttonFrame = Frame(frame)
         buttonFrame.grid(row=5, column=1)
 
-        self.buildButton= Button(buttonFrame, text="BUILD GAME", command=self.build)
+        self.buildButton = Button(buttonFrame, text="BUILD GAME", command=self.build)
         self.buildButton.grid(row=0, column=0)
 
         self.newTemplateButton = Button(buttonFrame, text="NEW TEMPLATE", command=self.template)
@@ -271,14 +272,17 @@ class App:
                 if sys.platform == 'win32':
                     os.startfile(path)
             except FileNotFoundError as e:
-                self.pushErrorMessage("The base template is missing. Please ensure that the application was installed successfully.", "creating template")
+                self.pushErrorMessage(
+                    "The base template is missing. Please ensure that the application was installed successfully.",
+                    "creating template")
 
     def build(self):
         if self.config.readyToRun():
             self.flushStatus()
             self.pushStatusMessage("Going to build!")
             try:
-                buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(), self.config.fileName.get(), self.pushStatusMessage)
+                buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(),
+                          self.config.fileName.get(), self.pushStatusMessage)
                 self.pushStatusMessage("Done building!")
             except BaseException as e:
                 self.pushErrorMessage(e)
@@ -302,6 +306,7 @@ class App:
 
     def flushStatus(self):
         self.status.delete(1.0, END)
+
 
 root = Tk()
 root.wm_title("Prototypical")

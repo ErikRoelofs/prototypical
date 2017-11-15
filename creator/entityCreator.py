@@ -12,6 +12,7 @@ from tts.deck import Deck as TTSDeck
 from tts.board import Board as TTSBoard
 from tts.token import Token as TTSToken
 from tts.bag import Bag as TTSBag
+from reader.content import read_content
 
 XMIN = -27
 XMAX = 27
@@ -97,32 +98,11 @@ class EntityCreator:
             converted.append(self.createEntity(coords, item))
         return converted
 
-    def parseContent(self, content):
-        if content == '':
-            return ()
-        parts = content.split(';')
-        contentItems = []
-        for part in parts:
-            if part == '':
-                continue
-            splits = part.split('x', 1)
-            if len(splits) == 1:
-                amount = 1
-                type = splits[0].strip()
-            else:
-                try:
-                    amount = int(splits[0])
-                    type = splits[1].strip()
-                except ValueError as e:
-                    raise ValueError("Unable to read amount of items to place. " + splits[0] + " is not a valid number.") from None
-            contentItems.append((amount, type))
-        return contentItems
-
     def createEntities(self, sheet):
         entities = []
         for col in range(0,min(14, sheet.ncols)):
             for row in range(0,min(14, sheet.nrows)):
-                content = self.parseContent(sheet.cell(rowx=row, colx=col).value)
+                content = read_content(sheet.cell(rowx=row, colx=col).value)
                 for item in content:
                     try:
                         object = self.findObjectByName(item[1])
