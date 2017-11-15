@@ -5,6 +5,10 @@ from reader.number import read_number
 class DeckParser:
     def parse(sheet, complexObjects):
         decks = []
+
+        if(sheet.ncols == 1):
+            return decks
+
         current_deck = None
         row = 0
         while row < sheet.nrows:
