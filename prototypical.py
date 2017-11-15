@@ -15,23 +15,14 @@ from sheetParser.diceParser import DiceParser
 from sheetParser.bagParser import BagParser
 from sheetParser.tokenParser import TokenParser
 from tests.complexTypeParserTest import ComplexTypeParserTest
-
+from domain.library import Library
 
 def runTests():
     # run test cases
     ComplexTypeParserTest().run()
 
 
-def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
-    # setup pygame as drawing library
-    import pygame
-    pygame.init()
-
-    # open save template
-    with open('data/template.json', 'r') as infile:
-        data = json.load(infile)
-        data['SaveName'] = fileName
-
+def parseFile(excelFile, progressCallback):
     # open excel file
     progressCallback("Reading spreadsheet: " + excelFile)
     workbook = xlrd.open_workbook(excelFile)
@@ -63,28 +54,48 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     bags = bagParser.parse(workbook.sheet_by_name('Containers'))
     progressCallback(str(len(bags)) + " bags succesfully extracted.")
 
+    progressCallback("Reading table... ", False)
+    creator = EntityCreator(tokens + dice + complexObjects + decks + bags)
+    entities = creator.createEntities(workbook.sheet_by_name('Placement'))
+    progressCallback(str(len(entities)) + " item succesfully extracted.")
+
+    return Library(tokens, dice, complexObjects, decks, bags, entities)
+
+def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
+    # setup pygame as drawing library
+    import pygame
+    pygame.init()
+
+    # open save template
+    with open('data/template.json', 'r') as infile:
+        data = json.load(infile)
+        data['SaveName'] = fileName
+
+    # parse here
+    library = parseFile(excelFile, progressCallback)
+
     progressCallback("Drawing all custom content.")
 
     # draw all the card decks
     progressCallback("Drawing decks... ", False)
     drawer = DeckDrawer()
-    for deck in decks:
+    for deck in library.decks:
         path = imagesDir + '/' + deck.name + ".jpg"
         pygame.image.save(drawer.draw(deck), path)
         deck.setImagePath(path)
 
     # draw all the deck backs
     drawer = CardBackDrawer()
-    for deck in decks:
+    for deck in library.decks:
         path = imagesDir + '/' + deck.name + "_back.jpg"
         pygame.image.save(drawer.draw(deck), path)
         deck.setBackImagePath(path)
-    progressCallback(str(len(decks)) + " decks succesfully drawn.")
+    progressCallback(str(len(library.decks)) + " decks succesfully drawn.")
 
     # draw all the boards
     progressCallback("Drawing boards... ", False)
     done = 0
-    for obj in complexObjects:
+    for obj in library.complexObjects:
         if obj.type.type == 'board':
             path = imagesDir + '/' + obj.name + ".jpg"
             drawer = ComplexObjectDrawer(obj)
@@ -96,7 +107,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     # draw all the (custom) tokens
     progressCallback("Drawing tokens... ", False)
     done = 0
-    for token in tokens:
+    for token in library.tokens:
         if isinstance(token, ContentToken):
             path = imagesDir + '/token_' + token.name + ".jpg"
             drawer = TokenDrawer(token)
@@ -108,7 +119,7 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     # draw all dice
     progressCallback("Drawing dice... ", False)
     done = 0
-    for die in dice:
+    for die in library.dice:
         if die.customContent:
             path = imagesDir + '/die_' + die.name + ".png"
             drawer = DiceDrawer(die)
@@ -118,13 +129,9 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     progressCallback(str(done) + " dice succesfully drawn.")
 
     progressCallback("Placing all entities on the tabletop.")
-    # build all required entities
-    creator = EntityCreator(tokens + dice + complexObjects + decks + bags)
-    entities = creator.createEntities(workbook.sheet_by_name('Placement'))
-    progressCallback("All entities have been placed.")
-
     # add entities to save file
-    data["ObjectStates"] = entities
+    data["ObjectStates"] = library.entities
+    progressCallback("All entities have been placed.")
 
     # save file
     path = saveDir + '/TS_' + fileName.replace(' ', '_') + '.json'
@@ -165,6 +172,9 @@ class Config:
 
     def readyToRun(self):
         return self.excelFile.get() and self.saveDir.get() and self.imagesDir.get() and self.fileName.get()
+
+    def readyToParse(self):
+        return self.excelFile.get()
 
     def loadConfig(self):
         try:
@@ -211,11 +221,14 @@ class App:
         buttonFrame = Frame(frame)
         buttonFrame.grid(row=5, column=1)
 
+        self.parseButton = Button(buttonFrame, text="PARSE GAME", command=self.parse)
+        self.parseButton.grid(row=0, column=0)
+
         self.buildButton = Button(buttonFrame, text="BUILD GAME", command=self.build)
-        self.buildButton.grid(row=0, column=0)
+        self.buildButton.grid(row=0, column=1)
 
         self.newTemplateButton = Button(buttonFrame, text="NEW TEMPLATE", command=self.template)
-        self.newTemplateButton.grid(row=0, column=1)
+        self.newTemplateButton.grid(row=0, column=2)
 
         self.statusLabel = Label(frame, text="Status:")
         self.statusLabel.grid(row=6, column=0, columnspan=2)
@@ -289,6 +302,16 @@ class App:
                 raise e
         else:
             self.pushErrorMessage("Missing some settings. Please ensure all 4 settings above are configured properly.")
+
+    def parse(self):
+        self.flushStatus()
+        self.pushStatusMessage("Going to parse!")
+        try:
+            parseFile(self.config.excelFile.get(), self.pushStatusMessage)
+            self.pushStatusMessage("Done parsing!")
+        except BaseException as e:
+            self.pushErrorMessage(e)
+            raise e
 
     def pushErrorMessage(self, e, during="building"):
         import traceback
