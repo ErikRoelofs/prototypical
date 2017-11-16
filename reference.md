@@ -140,7 +140,7 @@ How large the bag should be. Using 1 will produce a normal sized bag. The number
 
 ### CONTENTS
 
-Each column starting with this one contains the name of an object that is in the bag. If you want multiple of the same item, put the name in multiple times. (Scheduled to be improved)
+Each column starting with this one contains the name of an object that is in the bag. If you want multiple copies of the same item, you can prepend the name by a number and then an 'x'; for example: 5xpawn
 
 If you picked an Infinite Bag, only put one thing here, as an Infinite Bag can only contain one thing.
 
@@ -171,9 +171,7 @@ To see (or modify) the list of supported colors, look at "colors.xls" in the dat
 (Note that if you modify it and then send your game-sheet to someone else, they will not be able to build it!)
 
 ### SIZE
-This is the size of the token. Note that the "Token" option ignores this; a custom token is always just big enough to hold the content.
-
-For everything else, larger numbers are larger tokens. A size of 1 is the normal size; the number can be floating point.
+This is the size of the token. A size of 1 is the normal size; the number can be floating point.
 
 ### TEXT-COLOR-FRONT
 

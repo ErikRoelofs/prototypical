@@ -42,4 +42,8 @@ class TokenParser:
         bg_color = ColorReader.read_color(sheet.cell(rowx=row, colx=2).value)
         text_color = ColorReader.read_color(sheet.cell(rowx=row, colx=4).value)
         content = sheet.cell(rowx=row, colx=5).value
-        return ContentToken(name, entity, bg_color, text_color, content)
+        try:
+            size = read_float(sheet.cell(rowx=row, colx=3).value)
+        except ValueError as e:
+            raise ValueError(str(e) + " (while reading " + name + ")") from None
+        return ContentToken(name, entity, bg_color, text_color, content, size)

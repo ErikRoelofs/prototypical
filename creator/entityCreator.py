@@ -64,7 +64,7 @@ class EntityCreator:
 
     def placeToken(self, coords, entity):
         if isinstance(entity, ContentToken):
-            transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 0, 0.1,0.1,0.1)
+            transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 0, entity.size,entity.size,entity.size)
             bs = TTSToken(transform, entity.imagePath)
             return bs.as_dict()
         else:
