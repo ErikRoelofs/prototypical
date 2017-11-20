@@ -20,12 +20,14 @@ from domain.library import Library
 from tests.complexTypeParserTest import ComplexTypeParserTest
 from tests.reader.color import ColorReaderTest
 from tests.reader.number import NumberReaderTest
+from tests.reader.dimensions import DimensionsReaderTest
 
 def runTests():
     # run test cases
     ComplexTypeParserTest().run()
     ColorReaderTest().run()
     NumberReaderTest().run()
+    DimensionsReaderTest().run()
 
 runTests()
 
