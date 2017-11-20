@@ -36,13 +36,17 @@ You can click "NEW TEMPLATE" to generate a new template. Place it anywhere you l
 
 Use "SET SAVE DIR" to select a directory to hold the generated save file. (This will usually be your saves folder for Tabletop Simulator, which is located in your documents directory under "My Games\Tabletop Simulator\Saves" )
 
+(If using Windows, Prototypical should auto-detect your save dir location and not show this option)
+
 Use "SET IMAGES DIR" to select a directory that will hold the generated images. This can be any directory you like.
 
 Use "SET GAME NAME" to set a name for the game. This will be visible inside Tabletop Simulator.
 
 Once your spreadsheet is filled with game components, click "BUILD GAME" to start the build process. If it completes succesfully, open up Tabletop Simulator, and your game should be available under Load/Save.
 
-If any errors happens, fix your spreadsheet, then try building again.
+If you just want to validate that there's no errors in your spreadsheet, you can click "PARSE GAME" to only scan the spreadsheet. It will *not* draw images or create a save game if you use this.
+
+If any errors happen, fix your spreadsheet, then try building or parsing again.
 
 ## Bugs, feedback?
 
