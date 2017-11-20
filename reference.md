@@ -99,6 +99,10 @@ This is the Complex Type used to render this object. It should contain the name 
 
 Any content needed for the Complex Type. Each column name references a letter in the shape, so if the shape contains 'c' in the top left corner, then on this sheet you should put whatever you want in the top left of the card in the 'c' column.
 
+Prototypical will try to pick the largest size of font that makes all the content still fit. Generally speaking, this should make the content readable.
+
+If you try to put _too much_ content in a small area though, it might fail during the drawing step. The only solution at that point is to increase the size of the area, or reduce the amount of content.
+
 ## Decks
 
 Decks are collection of cards. In order to place cards in the simulator, you need to collect them into decks. A deck might have multiple copies of the same card in it.
