@@ -1,22 +1,22 @@
 prototyper:
 
 BASIC:
-- needs a specifically defined excel format	(few hours)
-- needs a GUI tool to pick a file and a storage folder (few hours)
-- needs an Excel importer library to read the file (few hours)
-- needs to do a ton of parsing to convert the Excel file to domain info (weeks?)
-- needs a JSON writing library to convert the domain info to a TTS save file (days?)
-- needs image drawing/saving abilities (days?)
+- needs a specifically defined excel format
+- needs a GUI tool to pick a file and a storage folder
+- needs an Excel importer library to read the file
+- needs to do a ton of parsing to convert the Excel file to domain info
+- needs a JSON writing library to convert the domain info to a TTS save file
+- needs image drawing/saving abilities
 
 
 
 
 ADVANCED:
-- needs coupling with online hosting to upload excel files
+- needs coupling with online hosting to upload excel files (< might have to resort to Steam Workshop if no licensing)
 - needs to load the files on the server
-- needs support for on-the-fly image generation (and a "reload" button that drops the cache)
+- needs support for on-the-fly image generation (and a "reload" button that drops the cache < this cannot be done)
 - (needs to output a save file with web-based links)
-- needs some kind of license model
+- needs some kind of license model (< this might not be allowed)
 
 
 EXCEL FORMAT:
@@ -32,3 +32,27 @@ V- playing field content (number of sectors, content per sector)
 
 PROOF OF CONCEPT:
 VVV!!!- convert an excel file with some default markers into an importable save file
+
+
+Some todo:
+- support bags in bags
+- support 'ignore' content type for areas, which just copies over the old area (to allow custom drawing on images, without losing it)
+  - include a warn + make backup if dimensions change, as it won't look pretty
+- support 'image' content type which loads an image from the image directory
+- shuffle decks/bags when the game is loaded
+- collect all parsing errors (as far as possible) and list them together
+- allow dealing deck parts to new positions (such as player hand, or two draw stacks)
+- allow object tracking when rebuilding (so player re-positioning is remembered, where possible) ?
+- saving items to component chest?
+- create a TTS image for the load file created
+- allow saving as a new version instead of overwriting
+
+- allow changing basic room settings (table model) ?
+
+- automate documentation?
+- unit tests
+- actual website
+  - donate button
+  - download binaries
+  - docs
+ 

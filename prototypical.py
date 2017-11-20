@@ -21,6 +21,7 @@ from tests.complexTypeParserTest import ComplexTypeParserTest
 from tests.reader.color import ColorReaderTest
 from tests.reader.number import NumberReaderTest
 from tests.reader.dimensions import DimensionsReaderTest
+from tests.reader.content import ContentReaderTest
 
 def runTests():
     # run test cases
@@ -28,6 +29,7 @@ def runTests():
     ColorReaderTest().run()
     NumberReaderTest().run()
     DimensionsReaderTest().run()
+    ContentReaderTest().run()
 
 runTests()
 

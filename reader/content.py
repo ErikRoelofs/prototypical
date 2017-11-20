@@ -9,12 +9,13 @@ def read_content(value):
         splits = part.split('x', 1)
         if len(splits) == 1:
             amount = 1
-            type = splits[0].strip()
+            content_type = splits[0].strip()
         else:
-            try:
+            if splits[0].isdigit():
                 amount = int(splits[0])
-                type = splits[1].strip()
-            except ValueError as e:
-                raise ValueError("Unable to read amount of items to place. " + splits[0] + " is not a valid number.") from None
-        contentItems.append((amount, type))
+                content_type = splits[1].strip()
+            else:
+                amount = 1
+                content_type = splits[0].strip() + "x" + splits[1].strip()
+        contentItems.append((amount, content_type))
     return contentItems
