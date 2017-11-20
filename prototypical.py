@@ -16,6 +16,22 @@ from sheetParser.bagParser import BagParser
 from sheetParser.tokenParser import TokenParser
 from domain.library import Library
 
+import os, sys
+from shutil import copyfile
+
+def tryAndFindSaveGamesFolder():
+    if sys.platform != 'win32':
+        return None
+
+    import win32com.client
+    objShell = win32com.client.Dispatch("WScript.Shell")
+    docs = objShell.SpecialFolders("MyDocuments") + "\My Games\Tabletop Simulator\Saves"
+
+    if os.path.isdir(docs):
+        return docs
+
+    return None
+
 def parseFile(excelFile, progressCallback):
     # open excel file
     progressCallback("Reading spreadsheet: " + excelFile)
@@ -156,7 +172,12 @@ class Config:
         self.saveDir = saveDir
         self.imagesDir = imagesDir
         self.fileName = fileName
+        self.saveFolderDeduced = False
         self.loadConfig()
+        folder = tryAndFindSaveGamesFolder()
+        if folder:
+            self.saveDir.set(folder)
+            self.saveFolderDeduced = True
 
     def setExcelFile(self):
         self.excelFile.set(filedialog.askopenfilename(initialdir='~'))
@@ -179,6 +200,9 @@ class Config:
 
     def readyToParse(self):
         return self.excelFile.get()
+
+    def isSaveFolderDeduced(self):
+        return self.saveFolderDeduced
 
     def loadConfig(self):
         try:
@@ -257,11 +281,12 @@ class App:
         self.excelText.grid(row=1, column=1)
 
     def savedirFile(self, frame):
-        self.savedirButton = Button(frame, text="SET SAVE DIR", command=self.config.setSaveDir, width=30)
-        self.savedirButton.grid(row=2, column=0)
+        if not self.config.isSaveFolderDeduced():
+            self.savedirButton = Button(frame, text="SET SAVE DIR", command=self.config.setSaveDir, width=30)
+            self.savedirButton.grid(row=2, column=0)
 
-        self.savedirText = Label(frame, textvariable=self.config.saveDir)
-        self.savedirText.grid(row=2, column=1)
+            self.savedirText = Label(frame, textvariable=self.config.saveDir)
+            self.savedirText.grid(row=2, column=1)
 
     def imagedirFile(self, frame):
         self.imagedirButton = Button(frame, text="SET IMAGES DIR", command=self.config.setImagesDir, width=30)
@@ -280,8 +305,6 @@ class App:
     def template(self):
         file = filedialog.asksaveasfilename()
         if file:
-            import os, sys
-            from shutil import copyfile
             path = file + ".xls"
             try:
                 copyfile("data/template.xls", path)
