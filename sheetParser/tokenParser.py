@@ -44,6 +44,9 @@ class TokenParser:
         content = sheet.cell(rowx=row, colx=5).value
         try:
             size = read_float(sheet.cell(rowx=row, colx=3).value)
+            # for some reason, custom tokens of size 1 are HUGE.
+            # shrinking them down so they scale more logically with other stuff.
+            size = size / 5
         except ValueError as e:
             raise ValueError(str(e) + " (while reading " + name + ")") from None
         return ContentToken(name, entity, bg_color, text_color, content, size)
