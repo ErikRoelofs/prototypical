@@ -14,13 +14,20 @@ from sheetParser.deckParser import DeckParser
 from sheetParser.diceParser import DiceParser
 from sheetParser.bagParser import BagParser
 from sheetParser.tokenParser import TokenParser
-from tests.complexTypeParserTest import ComplexTypeParserTest
 from domain.library import Library
+
+
+from tests.complexTypeParserTest import ComplexTypeParserTest
+from tests.reader.color import ColorReaderTest
+from tests.reader.number import NumberReaderTest
 
 def runTests():
     # run test cases
     ComplexTypeParserTest().run()
+    ColorReaderTest().run()
+    NumberReaderTest().run()
 
+runTests()
 
 def parseFile(excelFile, progressCallback):
     # open excel file
