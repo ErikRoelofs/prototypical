@@ -66,31 +66,31 @@ class EntityCreator:
         if isinstance(entity, ContentToken):
             transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 0, entity.size,entity.size,entity.size)
             bs = TTSToken(transform, entity.imagePath)
-            return bs.as_dict()
+            return bs
         else:
             transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
             bs = SimpleToken(entity.entity, transform, entity.color)
-            return bs.as_dict()
+            return bs
 
     def placeDie(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
         die = TTSDie(entity.sides, entity.color, transform, entity.customContent, entity.imagePath)
-        return die.as_dict()
+        return die
 
     def placeDeck(self, coords, entity):
         transform = Transform(coords[0], YHEIGHT, coords[1], 0, 180, 180, 1,1,1)
         deck = TTSDeck(transform, entity.name, entity.cards, entity.imagePath, entity.backImagePath)
-        return deck.as_dict()
+        return deck
 
     def placeBoard(self, coords, entity):
         transform = Transform(coords[0], BOARDYHEIGHT, coords[1], 0, 0, 0, 1, 1, 1)
         board = TTSBoard(transform, entity)
-        return board.as_dict()
+        return board
 
     def placeBag(self, coords, entity):
         transform = Transform(coords[0], BOARDYHEIGHT, coords[1], 0, 0, 0, entity.size, entity.size, entity.size)
         bag = TTSBag(transform, entity.color, entity.name, self.convertToTTS(coords, entity.content), isinstance(entity, InfiniteBag))
-        return bag.as_dict()
+        return bag
 
     def convertToTTS(self, coords, items):
         converted = []

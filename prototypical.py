@@ -16,23 +16,6 @@ from sheetParser.bagParser import BagParser
 from sheetParser.tokenParser import TokenParser
 from domain.library import Library
 
-
-from tests.complexTypeParserTest import ComplexTypeParserTest
-from tests.reader.color import ColorReaderTest
-from tests.reader.number import NumberReaderTest
-from tests.reader.dimensions import DimensionsReaderTest
-from tests.reader.content import ContentReaderTest
-
-def runTests():
-    # run test cases
-    ComplexTypeParserTest().run()
-    ColorReaderTest().run()
-    NumberReaderTest().run()
-    DimensionsReaderTest().run()
-    ContentReaderTest().run()
-
-runTests()
-
 def parseFile(excelFile, progressCallback):
     # open excel file
     progressCallback("Reading spreadsheet: " + excelFile)
@@ -65,12 +48,13 @@ def parseFile(excelFile, progressCallback):
     bags = bagParser.parse(workbook.sheet_by_name('Containers'))
     progressCallback(str(len(bags)) + " bags succesfully extracted.")
 
-    progressCallback("Reading table... ", False)
+    # UGLY - we have to redo this step later because we set the image paths after drawing and these entities won't work
+    progressCallback("Reading table content... ", False)
     creator = EntityCreator(tokens + dice + complexObjects + decks + bags)
     entities = creator.createEntities(workbook.sheet_by_name('Placement'))
-    progressCallback(str(len(entities)) + " item succesfully extracted.")
+    progressCallback("Read " + str(len(entities)) + " items to be placed.", True)
 
-    return Library(tokens, dice, complexObjects, decks, bags, entities)
+    return Library(tokens, dice, complexObjects, decks, bags)
 
 def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     # setup pygame as drawing library
@@ -139,13 +123,22 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
             done += 1
     progressCallback(str(done) + " dice succesfully drawn.")
 
+    # UGLY - we already did this step during parsing but we need to create entities AFTER drawing or their image paths aren't set
+    creator = EntityCreator(library.all())
+    workbook = xlrd.open_workbook(excelFile)
+    entities = creator.createEntities(workbook.sheet_by_name('Placement'))
+
+    dicts = []
+    for entity in entities:
+        dicts.append(entity.as_dict())
+
     progressCallback("Placing all entities on the tabletop.")
     # add entities to save file
-    data["ObjectStates"] = library.entities
+    data["ObjectStates"] = dicts
     progressCallback("All entities have been placed.")
 
     # save file
-    path = saveDir + '/TS_' + fileName.replace(' ', '_') + '.json'
+    path = saveDir + '\TS_' + fileName.replace(' ', '_') + '.json'
     progressCallback("Saving file to " + path)
     with open(path, 'w') as outfile:
         json.dump(data, outfile)
@@ -342,6 +335,27 @@ class App:
         self.status.delete(1.0, END)
 
 
+# tests - need to be moved!! (and not run on every load)
+from tests.complexTypeParserTest import ComplexTypeParserTest
+from tests.reader.color import ColorReaderTest
+from tests.reader.number import NumberReaderTest
+from tests.reader.dimensions import DimensionsReaderTest
+from tests.reader.content import ContentReaderTest
+
+def runTests():
+    # run test cases
+    ComplexTypeParserTest().run()
+    ColorReaderTest().run()
+    NumberReaderTest().run()
+    DimensionsReaderTest().run()
+    ContentReaderTest().run()
+    def emptyCallback(msg, newLine = True):
+        pass
+    parseFile("data/testgame.xls", emptyCallback)
+
+runTests()
+
+# run the app
 root = Tk()
 root.wm_title("Prototypical")
 app = App(root)

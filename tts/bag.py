@@ -11,7 +11,7 @@ class Bag():
     def contentItems(self):
         contentItems = []
         for item in self.content:
-            contentItems.append(item)
+            contentItems.append(item.as_dict())
         return contentItems
 
     def as_dict(self):
