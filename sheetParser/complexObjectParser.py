@@ -9,12 +9,13 @@ class ComplexObjectParser:
         row = 1
         while row < sheet.nrows:
             name = sheet.cell(rowx=row, colx=0).value
-            type = self.findType(sheet.cell(rowx=row, colx=1).value)
-            content = {}
-            for column in type.shape.areas:
-                content[ column ] = sheet.cell(rowx=row, colx=column).value
+            if name:
+                type = self.findType(sheet.cell(rowx=row, colx=1).value)
+                content = {}
+                for column in type.shape.areas:
+                    content[ column ] = sheet.cell(rowx=row, colx=column).value
 
-            complexObjects.append(ComplexObject(name, type, content))
+                complexObjects.append(ComplexObject(name, type, content))
             row += 1
         return complexObjects
 
