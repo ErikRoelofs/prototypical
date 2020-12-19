@@ -16,14 +16,18 @@ from sheetParser.bagParser import BagParser
 from sheetParser.tokenParser import TokenParser
 from domain.library import Library
 
-import os, sys
+import os, sys, pysftp
 from shutil import copyfile
 
 def tryAndFindSaveGamesFolder():
     if sys.platform != 'win32':
         return None
 
-    import win32com.client
+    try:
+        import win32com.client
+    except ImportError:
+        return None
+
     objShell = win32com.client.Dispatch("WScript.Shell")
     docs = objShell.SpecialFolders("MyDocuments") + "\My Games\Tabletop Simulator\Saves"
 
@@ -72,7 +76,7 @@ def parseFile(excelFile, progressCallback):
 
     return Library(tokens, dice, complexObjects, decks, bags)
 
-def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
+def buildFile(excelFile, imageBuilder, saveDir, fileName, progressCallback):
     # setup pygame as drawing library
     import pygame
     pygame.init()
@@ -91,15 +95,13 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     progressCallback("Drawing decks... ", False)
     drawer = DeckDrawer()
     for deck in library.decks:
-        path = imagesDir + '/' + deck.name + ".jpg"
-        pygame.image.save(drawer.draw(deck), path)
+        path = imageBuilder.build(drawer.draw(deck), deck.name, "jpg")
         deck.setImagePath(path)
 
     # draw all the deck backs
     drawer = CardBackDrawer()
     for deck in library.decks:
-        path = imagesDir + '/' + deck.name + "_back.jpg"
-        pygame.image.save(drawer.draw(deck), path)
+        path = imageBuilder.build(drawer.draw(deck), deck.name + "_back", "jpg")
         deck.setBackImagePath(path)
     progressCallback(str(len(library.decks)) + " decks succesfully drawn.")
 
@@ -108,9 +110,8 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     done = 0
     for obj in library.complexObjects:
         if obj.type.type == 'board':
-            path = imagesDir + '/' + obj.name + ".jpg"
             drawer = ComplexObjectDrawer(obj)
-            pygame.image.save(drawer.draw(), path)
+            path = imageBuilder.build(drawer.draw(), obj.name, "jpg")
             obj.setImagePath(path)
             done += 1
     progressCallback(str(done) + " boards succesfully drawn.")
@@ -120,9 +121,8 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     done = 0
     for token in library.tokens:
         if isinstance(token, ContentToken):
-            path = imagesDir + '/token_' + token.name + ".jpg"
             drawer = TokenDrawer(token)
-            pygame.image.save(drawer.draw(), path)
+            path = imageBuilder.build(drawer.draw(), "token_" + token.name, "jpg")
             token.setImagePath(path)
             done += 1
     progressCallback(str(done) + " custom tokens succesfully drawn.")
@@ -132,9 +132,8 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     done = 0
     for die in library.dice:
         if die.customContent:
-            path = imagesDir + '/die_' + die.name + ".png"
             drawer = DiceDrawer(die)
-            pygame.image.save(drawer.draw(), path)
+            path = imageBuilder.build(drawer.draw(), "die" + die.name, "png")
             die.setImagePath(path)
             done += 1
     progressCallback(str(done) + " dice succesfully drawn.")
@@ -159,7 +158,6 @@ def buildFile(excelFile, imagesDir, saveDir, fileName, progressCallback):
     with open(path, 'w') as outfile:
         json.dump(data, outfile)
 
-
 from tkinter import *
 from tkinter import filedialog
 from tkinter import simpledialog
@@ -167,11 +165,15 @@ from tkinter import font
 
 
 class Config:
-    def __init__(self, excelFile, saveDir, imagesDir, fileName):
+    def __init__(self, excelFile, saveDir, imagesDir, fileName, ftpServer, ftpUsername, ftpPassword, ftpBaseUrl):
         self.excelFile = excelFile
         self.saveDir = saveDir
         self.imagesDir = imagesDir
         self.fileName = fileName
+        self.ftpServer = ftpServer
+        self.ftpUsername = ftpUsername
+        self.ftpPassword = ftpPassword
+        self.ftpBaseUrl = ftpBaseUrl
         self.saveFolderDeduced = False
         self.loadConfig()
         folder = tryAndFindSaveGamesFolder()
@@ -195,6 +197,19 @@ class Config:
         self.fileName.set(simpledialog.askstring("Filename?", "Enter the filename:"))
         self.saveConfig()
 
+    def setFtpSettings(self):
+        self.ftpServer.set(simpledialog.askstring("Ftp server url?", "Enter the ftp url:"))
+        if self.ftpServer.get() == '':
+            self.ftpUsername.set('')
+            self.ftpPassword.set('')
+            self.ftpBaseUrl.set('')
+            self.saveConfig()
+            return
+        self.ftpUsername.set(simpledialog.askstring("Ftp server username?", "Enter the username:"))
+        self.ftpPassword.set(simpledialog.askstring("Ftp server password?", "Enter the ftp password:"))
+        self.ftpBaseUrl.set(simpledialog.askstring("Ftp www base url?", "Enter the ftp www base url:"))
+        self.saveConfig()
+
     def readyToRun(self):
         return self.excelFile.get() and self.saveDir.get() and self.imagesDir.get() and self.fileName.get()
 
@@ -212,6 +227,13 @@ class Config:
                 self.saveDir.set(data['s'])
                 self.imagesDir.set(data['i'])
                 self.fileName.set(data['f'])
+                try:
+                    self.ftpServer.set(data['f_s'])
+                    self.ftpUsername.set(data['f_u'])
+                    self.ftpPassword.set(data['f_p'])
+                    self.ftpBaseUrl.set(data['f_w'])
+                except KeyError:
+                    pass
         except FileNotFoundError:
             return
 
@@ -220,7 +242,11 @@ class Config:
             "e": self.excelFile.get(),
             "s": self.saveDir.get(),
             "i": self.imagesDir.get(),
-            "f": self.fileName.get()
+            "f": self.fileName.get(),
+            "f_s": self.ftpServer.get(),
+            "f_u": self.ftpUsername.get(),
+            "f_p": self.ftpPassword.get(),
+            "f_w": self.ftpBaseUrl.get()
         }
         with open('settings.json', 'w') as outfile:
             json.dump(data, outfile)
@@ -228,10 +254,12 @@ class Config:
 
 class App:
     def __init__(self, master):
+        import pygame
+        self.pygame = pygame
         self.master = master
         master.geometry("700x600")
         self.filenameVar = StringVar()
-        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar)
+        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar, StringVar(), StringVar(), StringVar(), StringVar())
 
         frame = Frame(master)
         frame.grid()
@@ -241,13 +269,17 @@ class App:
         self.headerLabel = Label(frame, text="Prototypical!", font=self.customFont)
         self.headerLabel.grid(row=0, column=0, columnspan=2)
 
+        self.ftpStatusText = StringVar()
+        self.setFtpStatus()
+
         self.excelFile(frame)
         self.savedirFile(frame)
         self.imagedirFile(frame)
         self.filename(frame)
+        self.ftpSettings(frame)
 
         buttonFrame = Frame(frame)
-        buttonFrame.grid(row=5, column=1)
+        buttonFrame.grid(row=6, column=1)
 
         self.parseButton = Button(buttonFrame, text="PARSE GAME", command=self.parse)
         self.parseButton.grid(row=0, column=0)
@@ -259,10 +291,10 @@ class App:
         self.newTemplateButton.grid(row=0, column=2)
 
         self.statusLabel = Label(frame, text="Status:")
-        self.statusLabel.grid(row=6, column=0, columnspan=2)
+        self.statusLabel.grid(row=7, column=0, columnspan=2)
 
         self.status = Text(frame)
-        self.status.grid(row=7, column=0, columnspan=2)
+        self.status.grid(row=8, column=0, columnspan=2)
         self.status.tag_configure("error", foreground="red", underline=True)
 
         try:
@@ -271,7 +303,16 @@ class App:
             version = 'dev'
 
         self.statusLabel = Label(frame, text="version: " + version)
-        self.statusLabel.grid(row=8, column=0, columnspan=2)
+        self.statusLabel.grid(row=9, column=0, columnspan=2)
+
+    def setFtpStatus(self):
+        if self.config.ftpServer.get() != '':
+            if testFtpConnection(self.config):
+                self.ftpStatusText.set(self.config.ftpServer.get() + ' as ' + self.config.ftpUsername.get())
+            else:
+                self.ftpStatusText.set("Failed to connect to " + self.config.ftpServer.get())
+        else:
+            self.ftpStatusText.set("Turned off (local only)")
 
     def excelFile(self, frame):
         self.excelButton = Button(frame, text="SET SPREADSHEET", command=self.config.setExcelFile, width=30)
@@ -302,6 +343,17 @@ class App:
         self.filenameText = Label(frame, textvariable=self.config.fileName)
         self.filenameText.grid(row=4, column=1)
 
+    def ftpSettings(self, frame):
+        self.ftpButton = Button(frame, text="CONFIGURE FTP", command=self.doFtpSettingsUpdate, width=30)
+        self.ftpButton.grid(row=5, column=0)
+
+        self.ftpText = Label(frame, textvariable=self.ftpStatusText)
+        self.ftpText.grid(row=5, column=1)
+
+    def doFtpSettingsUpdate(self):
+        self.config.setFtpSettings()
+        self.setFtpStatus()
+
     def template(self):
         file = filedialog.asksaveasfilename()
         if file:
@@ -321,7 +373,7 @@ class App:
             self.flushStatus()
             self.pushStatusMessage("Going to build!")
             try:
-                buildFile(self.config.excelFile.get(), self.config.imagesDir.get(), self.config.saveDir.get(),
+                buildFile(self.config.excelFile.get(), imageBuilder(self.pygame, self.config), self.config.saveDir.get(),
                           self.config.fileName.get(), self.pushStatusMessage)
                 self.pushStatusMessage("Done building!")
             except BaseException as e:
@@ -356,6 +408,79 @@ class App:
 
     def flushStatus(self):
         self.status.delete(1.0, END)
+
+def imageBuilder(pygame, config):
+    if config.ftpBaseUrl.get() != '':
+        return ftpDirImageBuilder(
+            pygame,
+            config.imagesDir.get(),
+            config.ftpBaseUrl.get(),
+            config.ftpServer.get(),
+            config.ftpUsername.get(),
+            config.ftpPassword.get(),
+            config.fileName.get()
+        )
+    else:
+        return imagesDirImageBuilder(pygame, config.imagesDir.get())
+
+class imagesDirImageBuilder:
+    def __init__(self, pygame, basePath):
+        self.pygame = pygame
+        self.basePath = basePath
+    def build(self, image, file, extension):
+        path = self.basePath + '/' + file + "." + extension
+        self.pygame.image.save(image, path)
+        return path
+
+class ftpDirImageBuilder:
+    def __init__(self, pygame, imageBasePath, ftpBasePath, ftpServer, ftpUsername, ftpPassword, gameName):
+        self.imageBasePath = imageBasePath
+        self.ftpBasePath = ftpBasePath
+        self.pygame = pygame
+        self.ftpServer = ftpServer
+        self.ftpUsername = ftpUsername
+        self.ftpPassword = ftpPassword
+        self.gameName = gameName
+    def build(self, image, file, extension):
+        localPath = self.imageBasePath + '/' + file + "." + extension
+        localName = file + '.' + extension
+        self.pygame.image.save(image, localPath)
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
+        con = pysftp.Connection(
+            host=self.ftpServer,
+            username=self.ftpUsername,
+            password=self.ftpPassword,
+            cnopts=cnopts
+        )
+        with pysftp.cd(self.imageBasePath):
+            # todo: this is an issue when going public
+            con.chdir('www/prototypes')
+            if not con.exists(self.gameName):
+                con.mkdir(self.gameName)
+            con.chdir(self.gameName)
+            if con.exists(self.gameName):
+                con.remove(localName)
+            con.put(localName)
+        con.close()
+        return self.ftpBasePath + '/' + self.gameName + '/' + file + '.' + extension
+
+
+def testFtpConnection(config):
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
+
+    try:
+        con = pysftp.Connection(
+            host=config.ftpServer.get(),
+            username=config.ftpUsername.get(),
+            password=config.ftpPassword.get(),
+            cnopts=cnopts
+        )
+        con.close()
+        return True
+    except BaseException:
+        return False
 
 
 # tests - need to be moved!! (and not run on every load)

@@ -12,3 +12,4 @@ build/
 *.html
 !data/template.xls
 *.zip
+sftp.py
