@@ -165,12 +165,13 @@ from tkinter import font
 
 
 class Config:
-    def __init__(self, excelFile, saveDir, imagesDir, fileName, ftpServer, ftpUsername, ftpPassword, ftpBaseUrl):
+    def __init__(self, excelFile, saveDir, imagesDir, fileName, ftpServer, ftpFolder, ftpUsername, ftpPassword, ftpBaseUrl):
         self.excelFile = excelFile
         self.saveDir = saveDir
         self.imagesDir = imagesDir
         self.fileName = fileName
         self.ftpServer = ftpServer
+        self.ftpFolder = ftpFolder
         self.ftpUsername = ftpUsername
         self.ftpPassword = ftpPassword
         self.ftpBaseUrl = ftpBaseUrl
@@ -205,6 +206,7 @@ class Config:
             self.ftpBaseUrl.set('')
             self.saveConfig()
             return
+        self.ftpFolder.set(simpledialog.askstring("Ftp folder to use?", "Enter the folder:"))
         self.ftpUsername.set(simpledialog.askstring("Ftp server username?", "Enter the username:"))
         self.ftpPassword.set(simpledialog.askstring("Ftp server password?", "Enter the ftp password:"))
         self.ftpBaseUrl.set(simpledialog.askstring("Ftp www base url?", "Enter the ftp www base url:"))
@@ -232,6 +234,7 @@ class Config:
                     self.ftpUsername.set(data['f_u'])
                     self.ftpPassword.set(data['f_p'])
                     self.ftpBaseUrl.set(data['f_w'])
+                    self.ftpFolder.set(data['f_f'])
                 except KeyError:
                     pass
         except FileNotFoundError:
@@ -246,7 +249,8 @@ class Config:
             "f_s": self.ftpServer.get(),
             "f_u": self.ftpUsername.get(),
             "f_p": self.ftpPassword.get(),
-            "f_w": self.ftpBaseUrl.get()
+            "f_w": self.ftpBaseUrl.get(),
+            "f_f": self.ftpFolder.get()
         }
         with open('settings.json', 'w') as outfile:
             json.dump(data, outfile)
@@ -259,7 +263,7 @@ class App:
         self.master = master
         master.geometry("700x600")
         self.filenameVar = StringVar()
-        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar, StringVar(), StringVar(), StringVar(), StringVar())
+        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar, StringVar(), StringVar(), StringVar(), StringVar(), StringVar())
 
         frame = Frame(master)
         frame.grid()
@@ -416,6 +420,7 @@ def imageBuilder(pygame, config):
             config.imagesDir.get(),
             config.ftpBaseUrl.get(),
             config.ftpServer.get(),
+            config.ftpFolder.get(),
             config.ftpUsername.get(),
             config.ftpPassword.get(),
             config.fileName.get()
@@ -433,11 +438,12 @@ class imagesDirImageBuilder:
         return "file:///" + path
 
 class ftpDirImageBuilder:
-    def __init__(self, pygame, imageBasePath, ftpBasePath, ftpServer, ftpUsername, ftpPassword, gameName):
+    def __init__(self, pygame, imageBasePath, ftpBasePath, ftpServer, ftpFolder, ftpUsername, ftpPassword, gameName):
         self.imageBasePath = imageBasePath
         self.ftpBasePath = ftpBasePath
         self.pygame = pygame
         self.ftpServer = ftpServer
+        self.ftpFolder = ftpFolder
         self.ftpUsername = ftpUsername
         self.ftpPassword = ftpPassword
         self.gameName = gameName
@@ -454,8 +460,7 @@ class ftpDirImageBuilder:
             cnopts=cnopts
         )
         with pysftp.cd(self.imageBasePath):
-            # todo: this is an issue when going public
-            con.chdir('www/prototypes')
+            con.chdir(self.ftpFolder)
             if not con.exists(self.gameName):
                 con.mkdir(self.gameName)
             con.chdir(self.gameName)
