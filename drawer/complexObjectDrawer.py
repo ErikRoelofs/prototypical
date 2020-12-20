@@ -61,10 +61,13 @@ class ComplexObjectDrawer:
             raise BaseException("Unable to draw the card. Are you reserving enough space for all your content? Trying to write: " + str(content))
         self.surf.blit(surf, rect)
 
-    def drawIcon(self, content, rect):
+    def baseDrawImage(self, content, rect, type):
         import pygame
         rerect = pygame.Rect((0, 0, rect[2] - rect[0], rect[3] - rect[1]))
-        picture = self.obtainIcon(content)
+        if type == 'icon':
+            picture = self.obtainIcon(content)
+        else:
+            picture = self.obtainImage(content)
         # rescale but keep proportions
         origWidth = picture.get_width()
         origHeight = picture.get_height()
@@ -73,37 +76,31 @@ class ComplexObjectDrawer:
         scaledPicture = pygame.transform.scale(picture, (int(origWidth * scaleFactor), int(origHeight * scaleFactor)))
 
         self.surf.blit(scaledPicture, rect)
+
+    def drawIcon(self, content, rect):
+        self.baseDrawImage(content, rect, "icon")
 
     def drawImage(self, content, rect):
-        import pygame
-        rerect = pygame.Rect((0, 0, rect[2] - rect[0], rect[3] - rect[1]))
-        picture = self.obtainImage(content)
-        # rescale but keep proportions
-        origWidth = picture.get_width()
-        origHeight = picture.get_height()
-        scaleFactor = min(rerect.width / origWidth, rerect.height / origHeight)
+        self.baseDrawImage(content, rect, "image")
 
-        scaledPicture = pygame.transform.scale(picture, (int(origWidth * scaleFactor), int(origHeight * scaleFactor)))
-
-        self.surf.blit(scaledPicture, rect)
+    def baseObtainImage(self, content, type, replace, folder):
+        name = content.replace(replace, "")
+        filename = folder + "/" + name + ".jpg"
+        try:
+            return pygame.image.load(filename)
+        except FileNotFoundError:
+            if type == 'icon':
+                self.makeIcon(name)
+                return self.obtainIcon(content)
+            else:
+                self.makeImage(name)
+                return self.obtainImage(content)
 
     def obtainIcon(self, content):
-        iconName = content.replace("\\icon ", "")
-        filename = "icons/" + iconName + ".jpg"
-        try:
-            return pygame.image.load(filename)
-        except FileNotFoundError:
-            self.makeIcon(iconName)
-            return self.obtainIcon(content)
+        return self.baseObtainImage(content, "icon", "\\icon", 'icons')
 
     def obtainImage(self, content):
-        iconName = content.replace("\\image ", "")
-        filename = "images/" + iconName.replace(' ', '_') + ".jpg"
-        try:
-            return pygame.image.load(filename)
-        except FileNotFoundError:
-            self.makeImage(iconName)
-            return self.obtainImage(content)
+        return self.baseObtainImage(content, "image", "\\image", 'images')
 
     def makeIcon(self, name):
         self.makeImageBase(name, name + " icon", "icons", "gray")
