@@ -31,6 +31,8 @@ class ColorReader():
 
         if value[0] == '#':
             return ColorReader.read_color_by_code(value)
+        elif value[0] == '\\':
+            return value  # this is an image or icon
         else:
             return ColorReader.read_color_by_name(value)
 

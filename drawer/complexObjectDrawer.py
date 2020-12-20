@@ -18,11 +18,16 @@ class ComplexObjectDrawer:
     def draw(self):
         w, h = self.getCardSize()
         self.surf = pygame.Surface((w - 2 * EDGE_MARGIN, h - 2 * EDGE_MARGIN))
-        self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
+        if isinstance(self.object.type.bgColor, str):
+            self.drawImage(self.surf, self.object.type.bgColor, self.surf.get_rect())
+        else:
+            self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
         for key, content in self.object.content.items():
             self.drawContentToArea(content, self.object.type.shape.areas[key])
         self.fullSurf = pygame.Surface((w, h))
-        self.fullSurf.fill(convert_tts_to_pygame(self.object.type.bgColor))
+
+        self.fullSurf.fill(convert_tts_to_pygame((0, 0, 0)))
+
         self.fullSurf.blit(self.surf, (EDGE_MARGIN, EDGE_MARGIN))
         return self.fullSurf
 
@@ -44,9 +49,9 @@ class ComplexObjectDrawer:
             (area[2]+1) * dh / self.size[1] - TOPBOTTOM_MARGIN
         )
         if isinstance(content, str) and "\\icon" in content:
-            self.drawIcon(content, rect)
+            self.drawIcon(self.surf, content, rect)
         elif isinstance(content, str) and "\\image" in content:
-            self.drawImage(content, rect)
+            self.drawImage(self.surf, content, rect)
         else:
             self.write(content, rect)
 
@@ -61,7 +66,7 @@ class ComplexObjectDrawer:
             raise BaseException("Unable to draw the card. Are you reserving enough space for all your content? Trying to write: " + str(content))
         self.surf.blit(surf, rect)
 
-    def baseDrawImage(self, content, rect, type):
+    def baseDrawImage(self, surf, content, rect, type):
         import pygame
         rerect = pygame.Rect((0, 0, rect[2] - rect[0], rect[3] - rect[1]))
         if type == 'icon':
@@ -75,13 +80,13 @@ class ComplexObjectDrawer:
 
         scaledPicture = pygame.transform.scale(picture, (int(origWidth * scaleFactor), int(origHeight * scaleFactor)))
 
-        self.surf.blit(scaledPicture, rect)
+        surf.blit(scaledPicture, rect)
 
-    def drawIcon(self, content, rect):
-        self.baseDrawImage(content, rect, "icon")
+    def drawIcon(self, surf, content, rect):
+        self.baseDrawImage(surf, content, rect, "icon")
 
-    def drawImage(self, content, rect):
-        self.baseDrawImage(content, rect, "image")
+    def drawImage(self, surf, content, rect):
+        self.baseDrawImage(surf, content, rect, "image")
 
     def baseObtainImage(self, content, type, replace, folder):
         name = content.replace(replace, "")
@@ -97,10 +102,10 @@ class ComplexObjectDrawer:
                 return self.obtainImage(content)
 
     def obtainIcon(self, content):
-        return self.baseObtainImage(content, "icon", "\\icon", 'icons')
+        return self.baseObtainImage(content, "icon", "\\icon ", 'icons')
 
     def obtainImage(self, content):
-        return self.baseObtainImage(content, "image", "\\image", 'images')
+        return self.baseObtainImage(content, "image", "\\image ", 'images')
 
     def makeIcon(self, name):
         self.makeImageBase(name, name + " icon", "icons", "gray")
@@ -115,33 +120,38 @@ class ComplexObjectDrawer:
         filepath = self.getPathForImage(folder, name)
 
         if self.config.developerKey.get() == "":
-            surf = pygame.Surface((10, 10))
-            pygame.image.save(surf, filepath)
+            self.makeEmptyImage(filepath)
             return
 
         service = build("customsearch", "v1",
                         developerKey=self.config.developerKey.get())
+        try:
+            res = service.cse().list(
+                q=name + query,
+                cx=self.config.searchId.get(),
+                searchType='image',
+                num=1,
+                fileType="jpg",
+                imgColorType=colorType,
+                safe='off'
+            ).execute()
 
-        res = service.cse().list(
-            q=name + query,
-            cx=self.config.searchId.get(),
-            searchType='image',
-            num=1,
-            fileType="jpg",
-            imgColorType=colorType,
-            safe='off'
-        ).execute()
-
-        if not 'items' in res:
-            raise BaseException("Could not find an icon for: " + name)
-        else:
-            for item in res['items']:
-                with open(filepath, 'wb') as handler:
-                    img_data = requests.get(item['link']).content
-                    handler.write(img_data)
+            if not 'items' in res:
+                raise BaseException("Could not find an icon for: " + name)
+            else:
+                for item in res['items']:
+                    with open(filepath, 'wb') as handler:
+                        img_data = requests.get(item['link']).content
+                        handler.write(img_data)
+        except BaseException:
+            self.makeEmptyImage(filepath)
 
     def getPathForImage(self, subfolder, imagename):
         import os
         if not os.path.exists(self.config.imagesDir.get() + '/' + subfolder):
             os.mkdir(self.config.imagesDir.get() + '/' + subfolder)
         return self.config.imagesDir.get() + '/' + subfolder + '/' + imagename.replace(' ', '_') + '.jpg'
+
+    def makeEmptyImage(self, filepath):
+        surf = pygame.Surface((10, 10))
+        pygame.image.save(surf, filepath)
