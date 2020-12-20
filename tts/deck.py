@@ -73,8 +73,8 @@ class Deck():
                 'DeckIDs': self.get_ids(),
                 'CustomDeck': {
                     '1': {
-                        'FaceURL': 'file:///' + self.imagePath,
-                        'BackURL': 'file:///' + self.backImagePath,
+                        'FaceURL': self.imagePath,
+                        'BackURL': self.backImagePath,
                         'NumWidth': 10,
                         'NumHeight': 7,
                         'BackIsHidden': False,

@@ -45,7 +45,7 @@ class Die():
 
     def customDice(self):
         return {
-            "ImageURL": "file:///" + self.imagePath,
+            "ImageURL": self.imagePath,
             "ImageSecondaryURL": "",
             "WidthScale": 0.0,
             "CustomDice": {

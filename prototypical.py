@@ -430,7 +430,7 @@ class imagesDirImageBuilder:
     def build(self, image, file, extension):
         path = self.basePath + '/' + file + "." + extension
         self.pygame.image.save(image, path)
-        return path
+        return "file:///" + path
 
 class ftpDirImageBuilder:
     def __init__(self, pygame, imageBasePath, ftpBasePath, ftpServer, ftpUsername, ftpPassword, gameName):

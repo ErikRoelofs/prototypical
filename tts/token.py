@@ -26,8 +26,7 @@ class Token():
             'GridProjection': False,
             'Hands': False,
             "CustomImage": {
-                # todo: file:/// not neccesary if usink ftp
-                "ImageURL": "file:///" + self.image,
+                "ImageURL": self.image,
                 "ImageSecondaryURL": "",
                 "WidthScale": 0.0,
                 "CustomToken": {
