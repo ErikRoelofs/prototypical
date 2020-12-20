@@ -76,7 +76,7 @@ def parseFile(excelFile, progressCallback):
 
     return Library(tokens, dice, complexObjects, decks, bags)
 
-def buildFile(excelFile, imageBuilder, saveDir, fileName, progressCallback):
+def buildFile(excelFile, imageBuilder, saveDir, fileName, progressCallback, config):
     # setup pygame as drawing library
     import pygame
     pygame.init()
@@ -93,13 +93,13 @@ def buildFile(excelFile, imageBuilder, saveDir, fileName, progressCallback):
 
     # draw all the card decks
     progressCallback("Drawing decks... ", False)
-    drawer = DeckDrawer()
+    drawer = DeckDrawer(config)
     for deck in library.decks:
         path = imageBuilder.build(drawer.draw(deck), deck.name, "jpg")
         deck.setImagePath(path)
 
     # draw all the deck backs
-    drawer = CardBackDrawer()
+    drawer = CardBackDrawer(config)
     for deck in library.decks:
         path = imageBuilder.build(drawer.draw(deck), deck.name + "_back", "jpg")
         deck.setBackImagePath(path)
@@ -110,7 +110,7 @@ def buildFile(excelFile, imageBuilder, saveDir, fileName, progressCallback):
     done = 0
     for obj in library.complexObjects:
         if obj.type.type == 'board':
-            drawer = ComplexObjectDrawer(obj)
+            drawer = ComplexObjectDrawer(obj, config)
             path = imageBuilder.build(drawer.draw(), obj.name, "jpg")
             obj.setImagePath(path)
             done += 1
@@ -165,7 +165,7 @@ from tkinter import font
 
 
 class Config:
-    def __init__(self, excelFile, saveDir, imagesDir, fileName, ftpServer, ftpFolder, ftpUsername, ftpPassword, ftpBaseUrl):
+    def __init__(self, excelFile, saveDir, imagesDir, fileName, ftpServer, ftpFolder, ftpUsername, ftpPassword, ftpBaseUrl, developerKey, searchId):
         self.excelFile = excelFile
         self.saveDir = saveDir
         self.imagesDir = imagesDir
@@ -175,6 +175,8 @@ class Config:
         self.ftpUsername = ftpUsername
         self.ftpPassword = ftpPassword
         self.ftpBaseUrl = ftpBaseUrl
+        self.developerKey = developerKey
+        self.searchId = searchId
         self.saveFolderDeduced = False
         self.loadConfig()
         folder = tryAndFindSaveGamesFolder()
@@ -237,6 +239,12 @@ class Config:
                     self.ftpFolder.set(data['f_f'])
                 except KeyError:
                     pass
+                try:
+                    self.developerKey.set(data['g_d'])
+                    self.searchId.set(data['g_s'])
+                except KeyError:
+                    pass
+
         except FileNotFoundError:
             return
 
@@ -250,7 +258,9 @@ class Config:
             "f_u": self.ftpUsername.get(),
             "f_p": self.ftpPassword.get(),
             "f_w": self.ftpBaseUrl.get(),
-            "f_f": self.ftpFolder.get()
+            "f_f": self.ftpFolder.get(),
+            "g_d": self.developerKey.get(),
+            "g_s": self.searchId.get()
         }
         with open('settings.json', 'w') as outfile:
             json.dump(data, outfile)
@@ -263,7 +273,7 @@ class App:
         self.master = master
         master.geometry("700x600")
         self.filenameVar = StringVar()
-        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar, StringVar(), StringVar(), StringVar(), StringVar(), StringVar())
+        self.config = Config(StringVar(), StringVar(), StringVar(), self.filenameVar, StringVar(), StringVar(), StringVar(), StringVar(), StringVar(), StringVar(), StringVar())
 
         frame = Frame(master)
         frame.grid()
@@ -378,7 +388,7 @@ class App:
             self.pushStatusMessage("Going to build!")
             try:
                 buildFile(self.config.excelFile.get(), imageBuilder(self.pygame, self.config), self.config.saveDir.get(),
-                          self.config.fileName.get(), self.pushStatusMessage)
+                          self.config.fileName.get(), self.pushStatusMessage, self.config)
                 self.pushStatusMessage("Done building!")
             except BaseException as e:
                 self.pushErrorMessage(e)

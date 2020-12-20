@@ -7,8 +7,7 @@ ADVANCED TOPICS:
 
 TODO:
 - randomly name the ftp files to force a reload on image change
-- support column-header text instead of row text
-- support auto-loading icons through text
+- support auto-loading icons through text-content
 - support bags in bags
 - support 'ignore' content type for areas, which just copies over the old area (to allow custom drawing on images, without losing it)
   - include a warn + make backup if dimensions change, as it won't look pretty

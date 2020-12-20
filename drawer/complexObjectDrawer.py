@@ -10,13 +10,14 @@ TOPBOTTOM_MARGIN = 10
 
 class ComplexObjectDrawer:
 
-    def __init__(self, object):
+    def __init__(self, object, config):
         self.object = object
+        self.config = config
         self.size = self.getShapeSize(object.type.shape)
 
     def draw(self):
         w, h = self.getCardSize()
-        self.surf = pygame.Surface((w - 2 * EDGE_MARGIN,h - 2 * EDGE_MARGIN))
+        self.surf = pygame.Surface((w - 2 * EDGE_MARGIN, h - 2 * EDGE_MARGIN))
         self.surf.fill(convert_tts_to_pygame(self.object.type.bgColor))
         for key, content in self.object.content.items():
             self.drawContentToArea(content, self.object.type.shape.areas[key])
@@ -42,7 +43,12 @@ class ComplexObjectDrawer:
             (area[3]+1) * dw / self.size[0] - LEFTRIGHT_MARGIN,
             (area[2]+1) * dh / self.size[1] - TOPBOTTOM_MARGIN
         )
-        self.write(content, rect)
+        if isinstance(content, str) and "\\icon" in content:
+            self.drawIcon(content, rect)
+        elif isinstance(content, str) and "\\image" in content:
+            self.drawImage(content, rect)
+        else:
+            self.write(content, rect)
 
     def write(self, content, rect):
         if isinstance(content, float) and content.is_integer():
@@ -54,3 +60,85 @@ class ComplexObjectDrawer:
         if not surf:
             raise BaseException("Unable to draw the card. Are you reserving enough space for all your content? Trying to write: " + str(content))
         self.surf.blit(surf, rect)
+
+    def drawIcon(self, content, rect):
+        import pygame
+        rerect = pygame.Rect((0, 0, rect[2] - rect[0], rect[3] - rect[1]))
+        picture = self.obtainIcon(content)
+        # rescale but keep proportions
+        origWidth = picture.get_width()
+        origHeight = picture.get_height()
+        scaleFactor = min(rerect.width / origWidth, rerect.height / origHeight)
+
+        scaledPicture = pygame.transform.scale(picture, (int(origWidth * scaleFactor), int(origHeight * scaleFactor)))
+
+        self.surf.blit(scaledPicture, rect)
+
+    def drawImage(self, content, rect):
+        import pygame
+        rerect = pygame.Rect((0, 0, rect[2] - rect[0], rect[3] - rect[1]))
+        picture = self.obtainImage(content)
+        # rescale but keep proportions
+        origWidth = picture.get_width()
+        origHeight = picture.get_height()
+        scaleFactor = min(rerect.width / origWidth, rerect.height / origHeight)
+
+        scaledPicture = pygame.transform.scale(picture, (int(origWidth * scaleFactor), int(origHeight * scaleFactor)))
+
+        self.surf.blit(scaledPicture, rect)
+
+    def obtainIcon(self, content):
+        iconName = content.replace("\\icon ", "")
+        filename = "icons/" + iconName + ".jpg"
+        try:
+            return pygame.image.load(filename)
+        except FileNotFoundError:
+            self.makeIcon(iconName)
+            return self.obtainIcon(content)
+
+    def obtainImage(self, content):
+        iconName = content.replace("\\image ", "")
+        filename = "images/" + iconName.replace(' ', '_') + ".jpg"
+        try:
+            return pygame.image.load(filename)
+        except FileNotFoundError:
+            self.makeImage(iconName)
+            return self.obtainImage(content)
+
+    def makeIcon(self, name):
+        self.makeImageBase(name, name + " icon", "icons", "gray")
+
+    def makeImage(self, name):
+        self.makeImageBase(name, name, "images", "color")
+
+    def makeImageBase(self, name, query, folder, colorType):
+        import requests
+        from apiclient.discovery import build
+
+        filepath = folder + '/' + name.replace(' ', '_') + ".jpg"
+
+        if self.config.developerKey.get() == "":
+            surf = pygame.Surface((10, 10))
+            pygame.image.save(surf, filepath)
+            return
+
+        service = build("customsearch", "v1",
+                        developerKey=self.config.developerKey.get())
+
+        res = service.cse().list(
+            q=name + query,
+            cx=self.config.searchId.get(),
+            searchType='image',
+            num=1,
+            fileType="jpg",
+            imgColorType=colorType,
+            safe='off'
+        ).execute()
+
+        if not 'items' in res:
+            raise BaseException("Could not find an icon for: " + name)
+        else:
+            for item in res['items']:
+                with open(filepath, 'wb') as handler:
+                    img_data = requests.get(item['link']).content
+                    handler.write(img_data)
