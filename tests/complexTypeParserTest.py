@@ -11,6 +11,7 @@ class ComplexTypeParserTest (BasicTest):
             ComplexTypeParser.validateAllowed("a", 0, 1, {"a": (0,0,0,0)}), "The same char can follow on the next cell"
             ComplexTypeParser.validateAllowed("a", 0, 1, {"a": (0, 0, 0, 0)}), "The same char can follow on the next cell"
             ComplexTypeParser.validateAllowed("a", 1, 0, {"a": (0, 0, 0, 0)}), "The same char can follow on the next line"
+            ComplexTypeParser.validateAllowed("\\c", 0, 0, {}), "A backlash column should be allowed"
         except ValueError as e:
             raise e
 

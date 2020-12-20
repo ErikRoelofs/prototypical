@@ -13,7 +13,11 @@ class ComplexObjectParser:
                 type = self.findType(sheet.cell(rowx=row, colx=1).value)
                 content = {}
                 for column in type.shape.areas:
-                    content[ column ] = sheet.cell(rowx=row, colx=column).value
+                    # headers...
+                    if column < 1000:
+                        content[column] = sheet.cell(rowx=row, colx=column).value
+                    else:
+                        content[column] = sheet.cell(rowx=0, colx=column-1000).value
 
                 complexObjects.append(ComplexObject(name, type, content))
             row += 1

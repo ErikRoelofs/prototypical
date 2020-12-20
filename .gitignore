@@ -13,3 +13,4 @@ build/
 !data/template.xls
 *.zip
 sftp.py
+icon.py

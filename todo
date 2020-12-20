@@ -6,6 +6,7 @@ ADVANCED TOPICS:
 
 
 TODO:
+- randomly name the ftp files to force a reload on image change
 - support column-header text instead of row text
 - support auto-loading icons through text
 - support bags in bags

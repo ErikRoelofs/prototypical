@@ -105,9 +105,15 @@ class ComplexTypeParser:
     @staticmethod
     def reduceChar(chars):
         value = 0
+        isHeader = False
         for char in chars:
+            if char == '\\':
+                isHeader = True
+                continue
             value *= 26
             value += ord(char.lower()) - 96
 
+        if isHeader:
+            value = value + 1000
         # because 'c' is 0, a and b are reserved, and areas start from 0, but a=1
         return value - 1

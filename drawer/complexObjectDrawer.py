@@ -51,5 +51,6 @@ class ComplexObjectDrawer:
         # the render function expects a rect with 0,0 topleft.
         rerect = pygame.Rect((0,0, rect[2] - rect[0], rect[3] - rect[1]))
         surf = render_fitted_textrect(str(content), rerect, (0, 0, 0), (255, 255, 255))
-
+        if not surf:
+            raise BaseException("Unable to draw the card. Are you reserving enough space for all your content? Trying to write: " + str(content))
         self.surf.blit(surf, rect)
