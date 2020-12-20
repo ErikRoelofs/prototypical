@@ -85,7 +85,7 @@ class ComplexObjectDrawer:
 
     def baseObtainImage(self, content, type, replace, folder):
         name = content.replace(replace, "")
-        filename = folder + "/" + name + ".jpg"
+        filename = self.getPathForImage(folder, name)
         try:
             return pygame.image.load(filename)
         except FileNotFoundError:
@@ -112,7 +112,7 @@ class ComplexObjectDrawer:
         import requests
         from apiclient.discovery import build
 
-        filepath = folder + '/' + name.replace(' ', '_') + ".jpg"
+        filepath = self.getPathForImage(folder, name)
 
         if self.config.developerKey.get() == "":
             surf = pygame.Surface((10, 10))
@@ -139,3 +139,9 @@ class ComplexObjectDrawer:
                 with open(filepath, 'wb') as handler:
                     img_data = requests.get(item['link']).content
                     handler.write(img_data)
+
+    def getPathForImage(self, subfolder, imagename):
+        import os
+        if not os.path.exists(self.config.imagesDir.get() + '/' + subfolder):
+            os.mkdir(self.config.imagesDir.get() + '/' + subfolder)
+        return self.config.imagesDir.get() + '/' + subfolder + '/' + imagename.replace(' ', '_') + '.jpg'
