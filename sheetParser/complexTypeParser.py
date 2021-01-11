@@ -50,7 +50,10 @@ class ComplexTypeParser:
         for row in range(firstRow, lastRow + 1):
             cols = []
             for col in range(firstCol, lastCol + 1):
-                cols.append(shapeSheet.cell(rowx = row, colx = col).value)
+                try:
+                    cols.append(shapeSheet.cell(rowx = row, colx = col).value)
+                except IndexError as e:
+                    raise ValueError("Unable to parse a shape: it extends beyond the edge of the Shapes spreadsheet.")
             rows.append(cols)
 
         size = (lastCol - firstCol + 1, lastRow - firstRow + 1)

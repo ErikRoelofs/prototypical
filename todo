@@ -7,11 +7,11 @@ ADVANCED TOPICS:
 
 TODO:
 - randomly name the ftp files to force a reload on image change
-- support auto-loading icons through text-content
+- use game-icons.net icons?
+- support images for tokens, dice, and other content
 - support bags in bags
 - support 'ignore' content type for areas, which just copies over the old area (to allow custom drawing on images, without losing it)
   - include a warn + make backup if dimensions change, as it won't look pretty
-- support 'image' content type which loads an image from the image directory
 - shuffle decks/bags when the game is loaded
 - collect all parsing errors (as far as possible) and list them together
 - allow dealing deck parts to new positions (such as player hand, or two draw stacks)
@@ -28,4 +28,6 @@ TODO:
   - donate button
   - download binaries
   - docs
+  - code
+  - contact, issues & feedback
  
