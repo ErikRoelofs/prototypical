@@ -14,7 +14,6 @@ class ComplexObjectParser:
             if name or typeName:
                 isTemplate = self.isTemplate(typeName)
                 if isTemplate:
-                  print("handling template")
                   type = self.findType(typeName)
                   content = {}
                   for column in type.shape.areas:
